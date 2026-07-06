@@ -1,0 +1,92 @@
+#clientes {
+    padding: 80px 20px 100px 20px;
+    background: linear-gradient(180deg, #070f16 0%, #0f0f12 100%);
+    color: white;
+    text-align: center;
+}
+
+#clientes h2 {
+    position: relative;
+    width: fit-content;
+    margin: 0 auto;
+    font-size: 1.6rem
+}
+
+#clientes h2 .years {
+    position: absolute;
+    top: 6px;
+    left: 6rem;
+}
+
+#clientes h2 .values {
+    font-size: 4rem;
+    margin: 0 8px 0 5px;
+    letter-spacing: -3px;
+}
+
+#clientes .content {
+    margin: 100px 0;
+}
+
+#clientes .subsection-text {
+    margin: 0 auto;
+}
+
+.clients-list {
+    margin-top: 60px;
+}
+
+.client-grid {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 50px;
+    padding: 20px 0;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.client-track {
+    display: flex;
+    width: max-content;
+    gap: 30px;
+    will-change: transform;
+    cursor: grab;
+}
+
+.client-track:active {
+    cursor: grabbing;
+}
+
+.client-item {
+    background: radial-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease;
+    width: 200px;
+    height: 125px;
+}
+
+.client-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    filter: grayscale(1) brightness(5);
+    transition: filter 0.3s ease;
+}
+
+.client-item img.onlygs {
+    filter: grayscale(1) brightness(1);
+}
+
+.client-item:hover img {
+    filter: grayscale(0) brightness(1);
+}
+
+.client-item:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
+}

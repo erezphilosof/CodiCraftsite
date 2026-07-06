@@ -1,0 +1,50 @@
+{
+  "nodes": {
+    "dev": {
+      "title": "Software Development",
+      "content": "<div class='synergy-desc-box'><p>Building robust and scalable platforms using modern technologies and languages. We design and implement custom software tailored to your business needs.</p><ul><li>Clean and maintainable architectures</li><li>Modern frontend and backend development</li><li>Performance and database optimization</li></ul></div>"
+    },
+    "strat": {
+      "title": "Digital Strategy",
+      "content": "<div class='synergy-desc-box'><p>Strategic technology planning and consulting to align your business processes with the latest digital trends. We help define your digital transformation roadmap.</p><ul><li>Technology feasibility analysis</li><li>Digital roadmap design</li><li>Internal process optimization</li></ul></div>"
+    },
+    "ia": {
+      "title": "Applied AI",
+      "content": "<div class='synergy-desc-box'><p>Design and implementation of artificial intelligence and machine learning models. We automate complex tasks and generate precise business predictions.</p><ul><li>Custom Machine Learning algorithms</li><li>Natural language processing and computer vision</li><li>Integration of predictive models into production</li></ul></div>"
+    },
+    "cro": {
+      "title": "CRO (Conversion Rate Optimization)",
+      "content": "<div class='synergy-desc-box'><p>Exhaustive analysis of user behavior on your digital channels to maximize conversion rates and campaign return on investment.</p><ul><li>A/B and multivariate testing</li><li>Conversion funnel analysis</li><li>User experience (UX) optimization</li></ul></div>"
+    },
+    "flow": {
+      "title": "Information Flows",
+      "content": "<div class='synergy-desc-box'><p>Design and implementation of data architectures that guarantee optimal, secure, and real-time connectivity between your different systems and departments.</p><ul><li>API-driven systems integration</li><li>Real-time data processing and synchronization</li><li>Data flow security and governance</li></ul></div>"
+    },
+    "ethics": {
+      "title": "Ethics & Regulation (Compliance)",
+      "content": "<div class='synergy-desc-box'><p>Expert consulting to ensure that your technological developments and data processing activities comply strictly with current legislation and ethical guidelines.</p><ul><li>Data protection compliance (GDPR, etc.)</li><li>Ethical audit of algorithms and AI models</li><li>Privacy policies and technology risk governance</li></ul></div>"
+    }
+  },
+  "synergies": {
+    "dev-ia": {
+      "title": "Intelligent Software Development",
+      "content": "<p>Fusion of software engineering with artificial intelligence. We develop applications equipped with smart algorithms and advanced automation capable of learning and adapting.</p>"
+    },
+    "cro-dev": {
+      "title": "Conversion-Oriented Development",
+      "content": "<p>Applying solid web development practices to interactively optimize conversion. We build fast, responsive code designed to maximize conversions on your site.</p>"
+    },
+    "ia-strat": {
+      "title": "Enterprise AI Strategy",
+      "content": "<p>Strategic convergence of business-oriented artificial intelligence. We design strategic plans to integrate predictive models and optimize corporate decision-making.</p>"
+    },
+    "dev-strat": {
+      "title": "Strategic Tech Development",
+      "content": "<p>Alignment between custom technical development and business vision. We build software products with a clear strategic focus to ensure market success.</p>"
+    },
+    "cro-ia": {
+      "title": "Intelligent Conversion Optimization",
+      "content": "<p>Leveraging artificial intelligence to dynamically personalize user experience and optimize conversions in real-time based on detected behavior.</p>"
+    }
+  }
+}

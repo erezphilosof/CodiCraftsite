@@ -1,0 +1,22 @@
+{
+  "name": "brainit-copy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scrape.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^4.1.1",
+    "nodemailer": "^9.0.3",
+    "serverless-http": "^3.2.0",
+    "website-scraper": "^6.0.0"
+  }
+}

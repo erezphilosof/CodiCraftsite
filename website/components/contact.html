@@ -1,0 +1,166 @@
+<section id="contacto" class="dynamic-section">
+    <style>
+        .contact-hover-wrapper {
+            direction: rtl;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            cursor: default;
+        }
+        
+        .contact-title-main {
+            font-size: 3.5rem;
+            color: white;
+            margin: 0 0 10px 0;
+            transition: text-shadow 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* Pulse hover guide text */
+        .contact-guide-text {
+            color: #64748b;
+            font-size: 1.1rem;
+            margin: 0 0 30px 0;
+            transition: color 0.3s ease, opacity 0.3s ease;
+            animation: pulse-guide 2s infinite ease-in-out;
+        }
+        
+        @keyframes pulse-guide {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .contact-hover-wrapper:hover .contact-guide-text {
+            color: #94a3b8;
+            animation: none;
+            opacity: 1;
+        }
+        
+        .contact-hover-wrapper:hover .contact-title-main {
+            text-shadow: 0 0 25px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Hidden icons container by default */
+        .contact-links-row {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 20px;
+        }
+
+        /* Reveal on hover */
+        .contact-hover-wrapper:hover .contact-links-row {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Circular buttons styling */
+        .contact-circle-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .icon-circle-wrapper {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .btn-label-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #94a3b8;
+            transition: color 0.3s ease;
+        }
+
+        /* WhatsApp Hover Effects */
+        .whatsapp-btn:hover .icon-circle-wrapper {
+            background: rgba(37, 211, 102, 0.12);
+            border-color: rgba(37, 211, 102, 0.5);
+            color: #25d366;
+            box-shadow: 0 0 25px rgba(37, 211, 102, 0.25);
+            transform: scale(1.12);
+        }
+        .whatsapp-btn:hover .btn-label-text {
+            color: #25d366;
+        }
+
+        /* LinkedIn Hover Effects */
+        .linkedin-btn:hover .icon-circle-wrapper {
+            background: rgba(10, 102, 194, 0.12);
+            border-color: rgba(10, 102, 194, 0.5);
+            color: #0077b5;
+            box-shadow: 0 0 25px rgba(10, 102, 194, 0.25);
+            transform: scale(1.12);
+        }
+        .linkedin-btn:hover .btn-label-text {
+            color: #0077b5;
+        }
+        @media (max-width: 768px) {
+            .contact-links-row {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            .contact-guide-text {
+                display: none !important;
+            }
+            .contact-title-main {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+    
+    <div class="contact-hover-wrapper">
+        <h2 class="contact-title-main">צור קשר</h2>
+        <p class="contact-guide-text">עברו עם העכבר כאן כדי ליצור קשר</p>
+        
+        <div class="contact-links-row">
+            <!-- WhatsApp Erez -->
+            <a href="https://wa.me/972523267680" class="contact-circle-btn whatsapp-btn" target="_blank" rel="noopener noreferrer">
+                <div class="icon-circle-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.739-1.451L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.38 1.966 13.9 .943 11.24.943c-5.445 0-9.87 4.373-9.874 9.8.001 2.087.547 4.122 1.588 5.922L1.87 20.354l4.777-1.2zm12.355-6.195c-.332-.165-1.964-.97-2.268-1.082-.304-.112-.524-.165-.744.165-.22.33-.852 1.082-1.043 1.302-.192.22-.384.247-.717.082-1.826-.913-3.036-1.616-4.253-3.706-.322-.553.322-.514.922-1.714.1-.2.05-.375-.025-.54-.075-.165-.744-1.792-1.02-2.459-.268-.646-.542-.558-.744-.568-.19-.01-.41-.01-.628-.01-.219 0-.576.082-.876.412-.3.33-1.15 1.122-1.15 2.732 0 1.61 1.173 3.163 1.332 3.379.16.216 2.308 3.522 5.592 4.937.781.336 1.39.537 1.867.689.784.249 1.498.214 2.062.13.629-.094 1.964-.802 2.24-1.577.275-.773.275-1.439.193-1.577-.083-.138-.304-.22-.636-.385z"/></svg>
+                </div>
+                <span class="btn-label-text">ארז (ווטסאפ)</span>
+            </a>
+
+            <!-- WhatsApp Tal -->
+            <a href="https://wa.me/972527376309" class="contact-circle-btn whatsapp-btn" target="_blank" rel="noopener noreferrer">
+                <div class="icon-circle-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.739-1.451L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.38 1.966 13.9 .943 11.24.943c-5.445 0-9.87 4.373-9.874 9.8.001 2.087.547 4.122 1.588 5.922L1.87 20.354l4.777-1.2zm12.355-6.195c-.332-.165-1.964-.97-2.268-1.082-.304-.112-.524-.165-.744.165-.22.33-.852 1.082-1.043 1.302-.192.22-.384.247-.717.082-1.826-.913-3.036-1.616-4.253-3.706-.322-.553.322-.514.922-1.714.1-.2.05-.375-.025-.54-.075-.165-.744-1.792-1.02-2.459-.268-.646-.542-.558-.744-.568-.19-.01-.41-.01-.628-.01-.219 0-.576.082-.876.412-.3.33-1.15 1.122-1.15 2.732 0 1.61 1.173 3.163 1.332 3.379.16.216 2.308 3.522 5.592 4.937.781.336 1.39.537 1.867.689.784.249 1.498.214 2.062.13.629-.094 1.964-.802 2.24-1.577.275-.773.275-1.439.193-1.577-.083-.138-.304-.22-.636-.385z"/></svg>
+                </div>
+                <span class="btn-label-text">טל (ווטסאפ)</span>
+            </a>
+            
+            <!-- LinkedIn -->
+            <a href="https://www.linkedin.com/company/codi-craft1/" class="contact-circle-btn linkedin-btn" target="_blank" rel="noopener noreferrer">
+                <div class="icon-circle-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </div>
+                <span class="btn-label-text">LinkedIn</span>
+            </a>
+        </div>
+    </div>
+</section>

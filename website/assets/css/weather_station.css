@@ -1,0 +1,208 @@
+/* Codi's Weather Station Floating Widget CSS */
+
+#weather-station-container {
+    position: fixed;
+    bottom: 95px; /* Above the mobile sticky CTA and clear of other buttons */
+    left: 25px;
+    z-index: 1900;
+    font-family: 'Rubik', sans-serif;
+}
+
+#weather-station-bubble {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    border: 2px solid #00ffea;
+    box-shadow: 0 10px 30px rgba(0, 255, 234, 0.3), inset 0 0 10px rgba(0, 255, 234, 0.2);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white;
+    padding: 0;
+    outline: none;
+}
+
+#weather-station-bubble:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 15px 35px rgba(0, 255, 234, 0.5);
+}
+
+.weather-icon-wrapper {
+    font-size: 1.4rem;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.temp-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #00ffea;
+    font-family: monospace;
+}
+
+/* Weather window */
+#weather-station-window {
+    position: absolute;
+    bottom: 75px;
+    left: 0;
+    width: 320px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(8, 12, 24, 0.98));
+    border: 1px solid rgba(0, 255, 234, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(0, 255, 234, 0.15);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+#weather-station-window.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8) translateY(20px);
+}
+
+.weather-header {
+    background: rgba(0, 255, 234, 0.05);
+    border-bottom: 1px solid rgba(0, 255, 234, 0.2);
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.weather-header h4 {
+    margin: 0;
+    color: #fff;
+    font-family: 'Secular One', sans-serif;
+    font-size: 1.05rem;
+    text-shadow: 0 0 8px rgba(0, 255, 234, 0.4);
+}
+
+#weather-close-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+#weather-close-btn:hover {
+    color: #fff;
+}
+
+.weather-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.weather-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.weather-temp-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.weather-location {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.weather-temp {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    font-family: monospace;
+}
+
+.weather-desc {
+    font-size: 0.9rem;
+    color: #00ffea;
+    font-weight: 500;
+}
+
+.weather-mascot-block {
+    width: 75px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.weather-mascot-block img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    animation: bounceMascot 3s ease-in-out infinite alternate;
+}
+
+@keyframes bounceMascot {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-6px); }
+}
+
+.weather-advice-box {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.weather-advice-box p {
+    margin: 0;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.weather-cta-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    text-align: center;
+    background: linear-gradient(135deg, #00ffea 0%, #00a2ff 100%);
+    color: #000;
+    font-weight: 700;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0, 255, 234, 0.3);
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.weather-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 255, 234, 0.5);
+    filter: brightness(1.05);
+}
+
+@media (max-width: 600px) {
+    #weather-station-container {
+        bottom: 85px;
+        left: 15px;
+    }
+    #weather-station-window {
+        width: 290px;
+    }
+}

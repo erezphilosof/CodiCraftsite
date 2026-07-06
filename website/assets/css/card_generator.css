@@ -1,0 +1,452 @@
+/* CodiCraft Guild Card Creator Styling */
+
+.card-generator-section {
+    padding: 80px 20px;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+    direction: rtl;
+}
+
+.card-generator-container {
+    max-width: 1000px;
+    width: 100%;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(8, 12, 24, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
+    padding: 50px 40px;
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    flex-wrap: wrap;
+}
+
+/* Form Panel */
+.cg-form-panel {
+    flex: 1.2;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.cg-section-title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 2.2rem;
+    color: #fff;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.cg-section-desc {
+    color: #94a3b8;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.cg-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cg-group label {
+    color: #cbd5e1;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.cg-input {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 14px 18px;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Rubik', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.cg-input:focus {
+    border-color: #00ffea;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 10px rgba(0, 255, 234, 0.25);
+}
+
+.cg-select {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 14px 18px;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Rubik', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cg-select:focus {
+    border-color: #00ffea;
+}
+
+/* Avatar Grid Select */
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.avatar-option {
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.3s ease;
+    height: 75px;
+}
+
+.avatar-option img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.avatar-option:hover {
+    border-color: rgba(0, 255, 234, 0.5);
+    background: rgba(0, 255, 234, 0.03);
+}
+
+.avatar-option:hover img {
+    transform: scale(1.1);
+}
+
+.avatar-option.selected {
+    border-color: #00ffea;
+    background: rgba(0, 255, 234, 0.1);
+    box-shadow: 0 0 15px rgba(0, 255, 234, 0.2);
+}
+
+/* Preview Panel */
+.cg-preview-panel {
+    flex: 0.9;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+/* The Holographic Collector Card */
+.codicraft-card {
+    width: 320px;
+    height: 450px;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 3px solid #00ffea; /* Dynamic color via JS */
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 255, 234, 0.25);
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transform: perspective(1000px);
+    transition: transform 0.1s ease, box-shadow 0.3s ease;
+}
+
+/* Card Holographic Shine Overlay */
+.codicraft-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(105deg, 
+        transparent 30%, 
+        rgba(255, 255, 255, 0.08) 40%, 
+        rgba(0, 255, 234, 0.12) 50%, 
+        rgba(255, 255, 255, 0.08) 60%, 
+        transparent 70%);
+    background-size: 200% 200%;
+    background-position: 0% 0%;
+    pointer-events: none;
+    z-index: 10;
+    transition: background-position 0.1s ease;
+}
+
+.codicraft-card:hover::after {
+    background-position: 100% 100%;
+}
+
+/* Card Header */
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+    z-index: 2;
+}
+
+.card-title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 1.3rem;
+    color: #fff;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.card-badge {
+    background: rgba(0, 255, 234, 0.15);
+    border: 1px solid #00ffea;
+    color: #00ffea;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 8px;
+    text-transform: uppercase;
+}
+
+/* Card Avatar Box */
+.card-avatar-frame {
+    height: 170px;
+    background: radial-gradient(circle, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+}
+
+/* Tech Grid inside Avatar Frame */
+.card-avatar-frame::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 15px 15px;
+    pointer-events: none;
+}
+
+.card-avatar-img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
+    animation: cardFloat 3s ease-in-out infinite alternate;
+}
+
+@keyframes cardFloat {
+    0% { transform: translateY(0px) scale(1); }
+    100% { transform: translateY(-8px) scale(1.03); }
+}
+
+/* Card Stats Block */
+.card-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 2;
+    flex-grow: 1;
+}
+
+.stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.stat-name {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    width: 70px;
+    font-weight: 500;
+}
+
+.stat-bar-bg {
+    flex-grow: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    background: #00ffea; /* Dynamic color */
+    border-radius: 4px;
+    width: 50%;
+    transition: width 0.5s ease;
+}
+
+.stat-val {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    color: #fff;
+    width: 25px;
+    text-align: left;
+    font-weight: bold;
+}
+
+/* Card Footer */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 8px;
+    margin-top: auto;
+    font-size: 0.8rem;
+    color: #64748b;
+    z-index: 2;
+}
+
+.card-footer-branding {
+    font-family: 'Secular One', sans-serif;
+    color: #fff;
+    font-size: 0.85rem;
+    text-shadow: 0 0 5px rgba(0,255,234,0.4);
+}
+
+/* Download Button */
+.btn-download-card {
+    background: linear-gradient(135deg, #00ffea, #00a2ff);
+    color: #000;
+    border: none;
+    padding: 16px 36px;
+    border-radius: 14px;
+    font-family: 'Secular One', sans-serif;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 162, 255, 0.3);
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+}
+
+.btn-download-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 162, 255, 0.5);
+    background: linear-gradient(135deg, #00a2ff, #00ffea);
+}
+
+/* AI Avatar Generation Elements */
+.cg-prompt-row {
+    display: flex;
+    gap: 12px;
+}
+
+.cg-prompt-row .cg-input {
+    flex-grow: 1;
+}
+
+.btn-generate-ai {
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    color: white;
+    border: none;
+    padding: 0 25px;
+    border-radius: 12px;
+    font-family: 'Secular One', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    white-space: nowrap;
+}
+
+.btn-generate-ai:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.6);
+    filter: brightness(1.1);
+}
+
+.btn-generate-ai:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Loading Overlay inside Card Avatar Frame */
+.card-loader-container {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+}
+
+.card-loader-container.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.card-loader {
+    width: 48px;
+    height: 48px;
+    border: 4px dashed #00ffea;
+    border-radius: 50%;
+    animation: spinLoader 2s linear infinite;
+    filter: drop-shadow(0 0 8px #00ffea);
+}
+
+.card-loader-text {
+    color: #00ffea;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-shadow: 0 0 5px rgba(0, 255, 234, 0.3);
+}
+
+@keyframes spinLoader {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.card-avatar-img.hidden {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+@media (max-width: 800px) {
+    .card-generator-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 30px 20px;
+    }
+    .cg-form-panel, .cg-preview-panel {
+        width: 100%;
+        min-width: 100%;
+    }
+    .cg-prompt-row {
+        flex-direction: column;
+    }
+    .btn-generate-ai {
+        padding: 14px 18px;
+    }
+}

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<title>Mini Mario HTML - Fixed Jump</title>
+<style>
+  body{margin:0;background:#66b7ff;font-family:Arial;text-align:center;direction:rtl}
+  h1{margin:10px;color:white;text-shadow:2px 2px #000}
+  canvas{background:linear-gradient(#6ec6ff,#9be7ff);border:5px solid white;display:block;margin:0 auto}
+  .help{color:white;font-size:18px;text-shadow:1px 1px #000}
+  button{font-size:20px;margin:4px;padding:8px 14px}
+</style>
+  <link rel="stylesheet" href="assets/css/treasure_hunt.css">
+</head>
+<body>
+<h1>🍄 מיני מריו HTML - קפיצה מתוקנת</h1>
+<div class="help">חצים ← → לזוז | רווח (SPACE) לקפוץ | קפוץ על אויב כדי להביס</div>
+<canvas id="game" width="900" height="500"></canvas>
+<div>
+  <button onpointerdown="keys.left=true" onpointerup="keys.left=false" onpointerleave="keys.left=false">⬅️</button>
+  <button onclick="jump()">⬆️ קפוץ</button>
+  <button onpointerdown="keys.right=true" onpointerup="keys.right=false" onpointerleave="keys.right=false">➡️</button>
+  <button onclick="throwShell()">זרוק שריון 🐢</button>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const keys = {left:false,right:false};
+let gravity = 0.7;
+let cameraX = 0;
+let score = 0;
+let message = "תתחיל לזוז ולקפוץ!";
+let gameWon = false;
+
+const worldW = 2200;
+const groundY = 430;
+
+const player = {
+  x:60, y:330, w:34, h:50,
+  vx:0, vy:0,
+  onGround:false,
+  jumpReady:true,
+  big:false,
+  shells:0,
+  color:"#e53935"
+};
+
+const platforms = [
+  {x:0,y:groundY,w:700,h:70},
+  {x:760,y:groundY,w:500,h:70},
+  {x:1320,y:groundY,w:880,h:70},
+  {x:360,y:315,w:150,h:25},
+  {x:980,y:320,w:190,h:25},
+  {x:1530,y:300,w:220,h:25}
+];
+
+const luckyBlocks = [
+  {x:430,y:250,w:40,h:40,hit:false},
+  {x:1040,y:255,w:40,h:40,hit:false},
+  {x:1600,y:235,w:40,h:40,hit:false}
+];
+
+const enemies = [
+  {type:"goomba",x:520,y:390,w:34,h:34,vx:-1,alive:true},
+  {type:"turtle",x:850,y:385,w:38,h:42,vx:-0.8,alive:true},
+  {type:"goomba",x:1160,y:390,w:34,h:34,vx:-1,alive:true},
+  {type:"turtle",x:1480,y:385,w:38,h:42,vx:-0.8,alive:true},
+  {type:"goomba",x:1830,y:390,w:34,h:34,vx:-1.2,alive:true}
+];
+
+const mushrooms = [];
+const flyingShells = [];
+
+function rects(a,b){
+  return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+}
+
+// תיקון חשוב: נותן לקפוץ גם אם השחקן ממש קרוב לרצפה
+function canJump(){
+  if(player.onGround) return true;
+  for(const p of platforms){
+    const feet = {x:player.x+3, y:player.y+player.h, w:player.w-6, h:6};
+    if(rects(feet, p)) return true;
+  }
+  return false;
+}
+
+function jump(){
+  if(canJump()){
+    player.vy = player.big ? -15 : -14;
+    player.onGround = false;
+    message = "קפיצה!";
+  }
+}
+
+document.addEventListener("keydown", e=>{
+  if(e.key==="ArrowLeft" || e.key==="a" || e.key==="A") keys.left=true;
+  if(e.key==="ArrowRight" || e.key==="d" || e.key==="D") keys.right=true;
+
+  // תיקון: preventDefault כדי שהדף לא יגלול במקום לקפוץ
+  if(e.key==="ArrowUp" || e.key==="w" || e.key==="W"){
+    e.preventDefault();
+    if(player.jumpReady){
+      jump();
+      player.jumpReady = false;
+    }
+  }
+
+  if(e.code==="Space"){
+    e.preventDefault();
+    if(player.jumpReady){
+      jump();
+      player.jumpReady=false;
+    }
+  }
+});
+
+document.addEventListener("keyup", e=>{
+  if(e.key==="ArrowLeft" || e.key==="a" || e.key==="A") keys.left=false;
+  if(e.key==="ArrowRight" || e.key==="d" || e.key==="D") keys.right=false;
+  if(e.key==="ArrowUp" || e.key==="w" || e.key==="W") player.jumpReady = true;
+  if(e.code==="Space") player.jumpReady = true;
+});
+
+function throwShell(){
+  if(player.shells <= 0) return;
+  player.shells--;
+  flyingShells.push({
+    x:player.x + player.w/2,
+    y:player.y + player.h - 26,
+    w:28,h:24,
+    vx: player.vx < 0 ? -9 : 9
+  });
+  message = "שריון נזרק!";
+}
+
+function hitLuckyBlock(block){
+  if(block.hit) return;
+  block.hit = true;
+  mushrooms.push({x:block.x+5,y:block.y-28,w:30,h:28,vx:1.3,vy:-4,alive:true});
+  message = "יצאה פטרייה! תפוס אותה כדי לגדול 🍄";
+}
+
+function updatePlayer(){
+  player.vx = 0;
+  if(keys.left) player.vx = -4.2;
+  if(keys.right) player.vx = 4.2;
+
+  player.x += player.vx;
+  player.y += player.vy;
+  player.vy += gravity;
+  player.onGround = false;
+
+  for(const p of platforms){
+    if(rects(player,p)){
+      // נוחתים מלמעלה
+      if(player.vy >= 0 && player.y + player.h - player.vy <= p.y + 12){
+        player.y = p.y - player.h;
+        player.vy = 0;
+        player.onGround = true;
+      }
+      // פוגעים מלמטה בפלטפורמה
+      else if(player.vy < 0 && player.y - player.vy >= p.y + p.h - 12){
+        player.y = p.y + p.h;
+        player.vy = 0;
+      }
+    }
+  }
+
+  for(const b of luckyBlocks){
+    if(rects(player,b) && player.vy < 0 && player.y > b.y){
+      player.y = b.y + b.h;
+      player.vy = 2;
+      hitLuckyBlock(b);
+    }
+  }
+
+  if(player.x < 0) player.x = 0;
+  if(player.x > worldW-player.w) player.x = worldW-player.w;
+  if(player.y > 650) resetPlayer();
+
+  if(player.x > 2070){
+    gameWon = true;
+    message = "ניצחת! הגעת לסוף העולם 🏆";
+  }
+}
+
+function resetPlayer(){
+  player.x = 60; player.y = 330; player.vx = 0; player.vy = 0;
+  player.big = false; player.w = 34; player.h = 50; player.shells = 0;
+  message = "נפלת! נסה שוב";
+}
+
+function updateEnemies(){
+  for(const e of enemies){
+    if(!e.alive) continue;
+    e.x += e.vx;
+
+    let onAny = false;
+    for(const p of platforms){
+      const foot = {x:e.x,y:e.y+e.h+2,w:e.w,h:4};
+      if(rects(foot,p)) onAny = true;
+    }
+    if(!onAny || e.x < 0 || e.x > worldW-e.w) e.vx *= -1;
+
+    if(rects(player,e)){
+      const stomp = player.vy > 0 && player.y + player.h - player.vy <= e.y + 14;
+      if(stomp){
+        e.alive = false;
+        player.vy = -9;
+        score += e.type==="turtle" ? 200 : 100;
+        if(e.type==="turtle"){
+          player.shells++;
+          message = "לקחת שריון! לחץ רווח כדי לזרוק 🐢";
+        } else message = "גומבה הובס!";
+      } else {
+        if(player.big){
+          player.big = false;
+          player.h = 50;
+          player.y += 20;
+          message = "איבדת את הגדילה!";
+        } else resetPlayer();
+      }
+    }
+  }
+}
+
+function updateMushrooms(){
+  for(const m of mushrooms){
+    if(!m.alive) continue;
+    m.x += m.vx;
+    m.y += m.vy;
+    m.vy += gravity;
+
+    for(const p of platforms){
+      if(rects(m,p) && m.vy >= 0){
+        m.y = p.y - m.h;
+        m.vy = 0;
+      }
+    }
+
+    if(rects(player,m)){
+      m.alive=false;
+      if(!player.big){
+        player.big = true;
+        player.h = 70;
+        player.y -= 20;
+      }
+      score += 300;
+      message = "גדלת! עכשיו אתה חזק יותר 🍄";
+    }
+  }
+}
+
+function updateShells(){
+  for(const s of flyingShells){
+    s.x += s.vx;
+    for(const e of enemies){
+      if(e.alive && rects(s,e)){
+        e.alive = false;
+        score += 150;
+        message = "פגעת באויב עם שריון!";
+      }
+    }
+  }
+}
+
+function updateCamera(){
+  cameraX = player.x - 250;
+  if(cameraX < 0) cameraX = 0;
+  if(cameraX > worldW - canvas.width) cameraX = worldW - canvas.width;
+}
+
+function drawCloud(x,y){
+  ctx.fillStyle="white";
+  ctx.beginPath();
+  ctx.arc(x-cameraX,y,22,0,Math.PI*2);
+  ctx.arc(x+25-cameraX,y-12,28,0,Math.PI*2);
+  ctx.arc(x+55-cameraX,y,22,0,Math.PI*2);
+  ctx.fill();
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawCloud(160,90); drawCloud(700,70); drawCloud(1250,110); drawCloud(1800,80);
+
+  for(const p of platforms){
+    ctx.fillStyle="#3aa655";
+    ctx.fillRect(p.x-cameraX,p.y,p.w,15);
+    ctx.fillStyle="#7b4a20";
+    ctx.fillRect(p.x-cameraX,p.y+15,p.w,p.h-15);
+  }
+
+  for(const b of luckyBlocks){
+    ctx.fillStyle = b.hit ? "#a87532" : "#ffd83d";
+    ctx.fillRect(b.x-cameraX,b.y,b.w,b.h);
+    ctx.strokeStyle="#9b6b00"; ctx.lineWidth=3;
+    ctx.strokeRect(b.x-cameraX,b.y,b.w,b.h);
+    ctx.fillStyle="black"; ctx.font="28px Arial";
+    if(!b.hit) ctx.fillText("?", b.x-cameraX+12, b.y+30);
+  }
+
+  for(const m of mushrooms){
+    if(!m.alive) continue;
+    ctx.fillStyle="#e53935";
+    ctx.beginPath(); ctx.arc(m.x+15-cameraX,m.y+12,15,Math.PI,0); ctx.fill();
+    ctx.fillStyle="#ffe0b2"; ctx.fillRect(m.x+6-cameraX,m.y+12,18,16);
+    ctx.fillStyle="white";
+    ctx.beginPath(); ctx.arc(m.x+8-cameraX,m.y+7,4,0,Math.PI*2); ctx.arc(m.x+22-cameraX,m.y+7,4,0,Math.PI*2); ctx.fill();
+  }
+
+  for(const e of enemies){
+    if(!e.alive) continue;
+    if(e.type==="goomba"){
+      ctx.fillStyle="#8d5524";
+      ctx.beginPath();
+      ctx.arc(e.x+17-cameraX,e.y+16,18,Math.PI,0);
+      ctx.lineTo(e.x+34-cameraX,e.y+34);
+      ctx.lineTo(e.x-cameraX,e.y+34);
+      ctx.fill();
+      ctx.fillStyle="black";
+      ctx.fillRect(e.x+8-cameraX,e.y+16,5,5);
+      ctx.fillRect(e.x+22-cameraX,e.y+16,5,5);
+    } else {
+      ctx.fillStyle="#2e7d32";
+      ctx.beginPath(); ctx.arc(e.x+19-cameraX,e.y+18,19,Math.PI,0); ctx.fill();
+      ctx.fillStyle="#fdd835"; ctx.fillRect(e.x+4-cameraX,e.y+18,30,22);
+      ctx.fillStyle="#1b5e20"; ctx.fillRect(e.x+30-cameraX,e.y+12,14,14);
+    }
+  }
+
+  for(const s of flyingShells){
+    ctx.fillStyle="#1b5e20";
+    ctx.beginPath();
+    ctx.ellipse(s.x+s.w/2-cameraX,s.y+s.h/2,16,12,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle="#a5d6a7"; ctx.stroke();
+  }
+
+  ctx.fillStyle = player.big ? "#ff7043" : player.color;
+  ctx.fillRect(player.x-cameraX,player.y,player.w,player.h);
+  ctx.fillStyle="#1565c0";
+  ctx.fillRect(player.x-cameraX,player.y+player.h*0.45,player.w,player.h*0.55);
+  ctx.fillStyle="#ffe0bd";
+  ctx.fillRect(player.x+6-cameraX,player.y+8,player.w-12,16);
+  ctx.fillStyle="#d32f2f";
+  ctx.fillRect(player.x+3-cameraX,player.y-8,player.w-6,12);
+  ctx.fillStyle="black";
+  ctx.fillRect(player.x+player.w-11-cameraX,player.y+14,4,4);
+
+  ctx.fillStyle="#795548"; ctx.fillRect(2110-cameraX,250,8,180);
+  ctx.fillStyle="#ffeb3b"; ctx.fillRect(2118-cameraX,250,55,35);
+  ctx.fillStyle="black"; ctx.font="20px Arial"; ctx.fillText("סוף",2125-cameraX,275);
+
+  ctx.fillStyle="rgba(0,0,0,0.55)";
+  ctx.fillRect(0,0,canvas.width,42);
+  ctx.fillStyle="white";
+  ctx.font="20px Arial";
+  ctx.fillText("נקודות: "+score+"   שריונות: "+player.shells+"   "+message,20,28);
+
+  if(gameWon){
+    ctx.fillStyle="rgba(0,0,0,0.7)";
+    ctx.fillRect(220,150,460,150);
+    ctx.fillStyle="white";
+    ctx.font="38px Arial";
+    ctx.fillText("ניצחת! 🏆",380,210);
+  }
+}
+
+function loop(){
+  if(!gameWon){
+    updatePlayer();
+    updateEnemies();
+    updateMushrooms();
+    updateShells();
+    updateCamera();
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+  <script src="js/treasure_hunt.js" defer></script>
+</body>
+</html>

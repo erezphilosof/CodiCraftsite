@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>פלטפורמה מודרני - 8 עולמות</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 20% 20%, #2b4cff 0 0.5%, transparent 18%),
+      radial-gradient(circle at 80% 10%, #ff4fc3 0 0.5%, transparent 16%),
+      linear-gradient(135deg, #090914, #17172a 55%, #070711);
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  #game {
+    width: 1020px;
+    height: 590px;
+    margin: 12px auto;
+    position: relative;
+    overflow: hidden;
+    border: 5px solid #111;
+    border-radius: 26px;
+    box-shadow: 0 18px 45px rgba(0,0,0,.55), inset 0 0 0 4px rgba(255,255,255,.12);
+  }
+
+  #game::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(120deg, rgba(255,255,255,.22), transparent 18%, transparent 70%, rgba(255,255,255,.12));
+    z-index: 70;
+  }
+
+  #game.grass {
+    background:
+      radial-gradient(circle at 120px 85px, white 0 25px, transparent 26px),
+      radial-gradient(circle at 158px 78px, white 0 36px, transparent 37px),
+      radial-gradient(circle at 750px 100px, white 0 28px, transparent 29px),
+      radial-gradient(circle at 790px 91px, white 0 40px, transparent 41px),
+      linear-gradient(#49b9ff 0%, #baf2ff 62%, #5fe062 63%, #36a83d 100%);
+  }
+
+  #game.desert {
+    background:
+      radial-gradient(circle at 850px 85px, #ffe66d 0 44px, transparent 46px),
+      linear-gradient(#67d2ff 0%, #c8f4ff 58%, #f5d36f 59%, #d69a33 100%);
+  }
+
+  #game.beach {
+    background:
+      radial-gradient(circle at 150px 80px, white 0 26px, transparent 27px),
+      radial-gradient(circle at 190px 75px, white 0 37px, transparent 38px),
+      linear-gradient(#4bcaff 0%, #b9f7ff 50%, #20b8d8 51%, #1499c9 67%, #f7df8b 68%, #d8b55a 100%);
+  }
+
+  #game.snow {
+    background:
+      radial-gradient(circle at 180px 90px, white 0 24px, transparent 25px),
+      radial-gradient(circle at 218px 84px, white 0 34px, transparent 35px),
+      linear-gradient(#82dcff 0%, #dff8ff 63%, #f9fdff 64%, #b6e6ff 100%);
+  }
+
+  #game.forest {
+    background:
+      radial-gradient(circle at 130px 75px, rgba(24,130,38,.75) 0 70px, transparent 72px),
+      radial-gradient(circle at 310px 92px, rgba(8,94,22,.75) 0 78px, transparent 80px),
+      radial-gradient(circle at 790px 76px, rgba(12,110,26,.75) 0 75px, transparent 77px),
+      linear-gradient(#256f3a 0%, #123e22 60%, #45b447 61%, #236b2d 100%);
+  }
+
+  #game.mountains {
+    background:
+      linear-gradient(135deg, transparent 0 55%, #9fa4af 56%, #5a606c 70%, transparent 71%) 0 215px / 430px 270px repeat-x,
+      linear-gradient(#76d5ff 0%, #d2f6ff 58%, #747a84 59%, #3f454d 100%);
+  }
+
+  #game.sky {
+    background:
+      radial-gradient(circle at 130px 100px, #fff 0 36px, transparent 37px),
+      radial-gradient(circle at 182px 92px, #fff 0 50px, transparent 51px),
+      radial-gradient(circle at 710px 120px, #fff 0 45px, transparent 46px),
+      radial-gradient(circle at 760px 112px, #fff 0 58px, transparent 59px),
+      linear-gradient(#33a7ff 0%, #c3f1ff 100%);
+  }
+
+  #game.castle {
+    background:
+      radial-gradient(circle at 800px 100px, rgba(255,230,90,.86) 0 46px, transparent 48px),
+      linear-gradient(#ffc0e0 0%, #ffd9ee 48%, #c98cff 49%, #7446bb 100%);
+  }
+
+  #game.miniCastle {
+    background:
+      radial-gradient(circle at 820px 90px, rgba(255,170,50,.85) 0 45px, transparent 47px),
+      linear-gradient(var(--castleSky1) 0%, var(--castleSky2) 58%, var(--lava1) 59%, var(--lava2) 100%);
+  }
+
+  #world {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 590px;
+    width: 4300px;
+  }
+
+  #hud {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 90;
+    display: none;
+    gap: 8px;
+    align-items: center;
+    direction: rtl;
+  }
+
+  .hudChip {
+    background: rgba(255,255,255,.88);
+    border: 3px solid #111;
+    border-radius: 16px;
+    padding: 8px 12px;
+    font-size: 17px;
+    font-weight: 900;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.55);
+  }
+
+  #message {
+    position: absolute;
+    z-index: 130;
+    top: 190px;
+    width: 100%;
+    text-align: center;
+    font-size: 40px;
+    font-weight: 900;
+    color: #111;
+    text-shadow: 3px 3px 0 white;
+    display: none;
+    direction: rtl;
+    padding: 0 20px;
+  }
+
+  #startScreen {
+    position: absolute;
+    inset: 0;
+    z-index: 220;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,.28), transparent 20%),
+      radial-gradient(circle at 80% 25%, rgba(255,255,255,.18), transparent 18%),
+      linear-gradient(135deg, rgba(23,70,150,.86), rgba(16,16,40,.92));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    direction: rtl;
+    text-align: center;
+  }
+
+  #startBox {
+    width: 820px;
+    background: rgba(255,248,218,.96);
+    border: 6px solid #111;
+    border-radius: 30px;
+    padding: 26px;
+    box-shadow: 10px 10px 0 #000, 0 0 45px rgba(255,255,255,.24);
+  }
+
+  #startBox h1 {
+    margin: 0 0 10px;
+    font-size: 42px;
+    color: #e21b1b;
+    text-shadow: 3px 3px 0 white, 5px 5px 0 rgba(0,0,0,.15);
+  }
+
+  .subtitle {
+    font-size: 21px;
+    font-weight: 900;
+    margin: 8px 0 18px;
+  }
+
+  .instructionsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+    text-align: right;
+  }
+
+  .instructionCard {
+    background: white;
+    border: 4px solid #111;
+    border-radius: 18px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: 900;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.35);
+  }
+
+  .instructionCard span {
+    display: inline-block;
+    background: #ffe14b;
+    border: 3px solid #111;
+    border-radius: 10px;
+    padding: 4px 8px;
+    margin-left: 6px;
+  }
+
+  #startButton {
+    margin-top: 16px;
+    font-size: 27px;
+    font-weight: 900;
+    padding: 13px 42px;
+    border: 4px solid #111;
+    border-radius: 18px;
+    background: linear-gradient(#fff36a, #ffb928);
+    cursor: pointer;
+    box-shadow: 5px 5px 0 #000;
+  }
+
+  #startButton:hover {
+    transform: translateY(-2px);
+  }
+
+  .ground {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 4300px;
+    height: 72px;
+    z-index: 8;
+    box-shadow: inset 0 8px rgba(255,255,255,.18);
+  }
+
+  .grass .ground {
+    background:
+      linear-gradient(#38cc58 0 12px, #168b32 12px 18px, transparent 18px),
+      repeating-linear-gradient(90deg, #ca7a30 0 42px, #ad6429 42px 48px);
+  }
+  .desert .ground {
+    background:
+      linear-gradient(#f9d67a 0 14px, #db9f36 14px 100%),
+      repeating-linear-gradient(90deg, transparent 0 45px, rgba(120,70,0,.18) 45px 50px);
+  }
+  .beach .ground {
+    background:
+      linear-gradient(#ffe79a 0 16px, #d8b050 16px 100%),
+      repeating-linear-gradient(90deg, transparent 0 45px, rgba(100,80,0,.15) 45px 50px);
+  }
+  .snow .ground {
+    background:
+      linear-gradient(#ffffff 0 14px, #aee7ff 14px 22px, #76c8ee 22px 100%),
+      repeating-linear-gradient(90deg, transparent 0 45px, rgba(0,80,150,.13) 45px 50px);
+  }
+  .forest .ground {
+    background:
+      linear-gradient(#2fb344 0 14px, #165c27 14px 100%),
+      repeating-linear-gradient(90deg, transparent 0 45px, rgba(0,0,0,.25) 45px 50px);
+  }
+  .mountains .ground {
+    background:
+      linear-gradient(#80858f 0 14px, #454a54 14px 100%),
+      repeating-linear-gradient(90deg, transparent 0 45px, rgba(0,0,0,.25) 45px 50px);
+  }
+  .sky .ground {
+    background:
+      linear-gradient(#ffffff 0 14px, #d8f5ff 14px 100%),
+      repeating-linear-gradient(90deg, transparent 0 45px, rgba(0,80,150,.1) 45px 50px);
+  }
+  .castle .ground {
+    background:
+      linear-gradient(#ffb6df 0 14px, #8a55d6 14px 100%),
+      repeating-linear-gradient(90deg, transparent 0 45px, rgba(0,0,0,.18) 45px 50px);
+  }
+  .miniCastle .ground {
+    background:
+      linear-gradient(var(--lava1) 0 16px, var(--lava2) 16px 100%),
+      repeating-linear-gradient(90deg, transparent 0 45px, rgba(0,0,0,.25) 45px 50px);
+  }
+
+  .decor {
+    position: absolute;
+    bottom: 72px;
+    z-index: 1;
+    border: 4px solid rgba(0,0,0,.35);
+    filter: drop-shadow(5px 8px 0 rgba(0,0,0,.15));
+  }
+
+  .hill { width: 230px; height: 115px; border-radius: 130px 130px 0 0; background: linear-gradient(#70ef7f, #2aa143); }
+  .pyramid {
+    width: 0; height: 0; border: 0;
+    border-left: 115px solid transparent; border-right: 115px solid transparent;
+    border-bottom: 135px solid #c98b2d; background: transparent;
+  }
+  .palm { width: 32px; height: 135px; background: #9a5a25; border-radius: 14px; }
+  .palm::before { content: "🌴"; position: absolute; top: -58px; left: -38px; font-size: 84px; }
+  .snowHill { width: 240px; height: 110px; border-radius: 130px 130px 0 0; background: linear-gradient(#fff, #bfeeff); }
+  .tree { width: 48px; height: 155px; background: #7a431f; border-radius: 10px; }
+  .tree::before {
+    content: ""; position: absolute; left: -68px; top: -78px; width: 178px; height: 126px;
+    background: #166f2d; border: 4px solid #0a3d19; border-radius: 50%;
+  }
+  .mountain {
+    width: 0; height: 0; border: 0;
+    border-left: 135px solid transparent; border-right: 135px solid transparent;
+    border-bottom: 178px solid #686e78; background: transparent;
+  }
+  .cloudDecor { width: 220px; height: 84px; background: white; border-radius: 54px; }
+  .castleTower {
+    width: 115px; height: 185px; background: linear-gradient(#ff9bd2, #9f62df);
+    border: 5px solid #5a2597; border-radius: 16px 16px 0 0;
+  }
+  .castleTower::before { content: "👑"; position: absolute; top: -50px; left: 30px; font-size: 46px; }
+
+  .miniTower {
+    position: absolute;
+    bottom: 72px;
+    width: 125px;
+    height: 195px;
+    background: linear-gradient(var(--tower1), var(--tower2));
+    border: 5px solid #111;
+    border-radius: 14px 14px 0 0;
+    z-index: 3;
+    box-shadow: 8px 8px 0 rgba(0,0,0,.3);
+  }
+  .miniTower::before {
+    content: "";
+    position: absolute;
+    top: -34px;
+    left: -5px;
+    width: 125px;
+    height: 36px;
+    background: repeating-linear-gradient(90deg, var(--tower1) 0 22px, transparent 22px 35px);
+    border: 5px solid #111;
+    border-bottom: 0;
+  }
+
+  .lavaBubble {
+    position: absolute;
+    bottom: 84px;
+    width: 44px;
+    height: 44px;
+    border: 4px solid #111;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff394, var(--lava1), var(--lava2));
+    z-index: 10;
+    animation: bubble 1.2s infinite alternate;
+  }
+  @keyframes bubble { from { transform: translateY(0); } to { transform: translateY(-25px); } }
+
+  .block, .question, .platform {
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    border: 4px solid #111;
+    border-radius: 10px;
+    z-index: 12;
+    box-shadow: 5px 5px 0 rgba(0,0,0,.25);
+  }
+  .block {
+    background:
+      linear-gradient(90deg, transparent 0 22px, rgba(0,0,0,.25) 22px 26px, transparent 26px),
+      linear-gradient(#e2793b 0 23px, #8c3919 23px 27px, #c65a2b 27px);
+  }
+  .question {
+    background: radial-gradient(circle at 35% 30%, #fff3aa 0 5px, transparent 7px), linear-gradient(#ffdf55, #ef9e13);
+    text-align: center;
+    line-height: 46px;
+    font-size: 34px;
+    color: white;
+    font-weight: 900;
+    text-shadow: 2px 2px 0 #8a5a00;
+  }
+  .platform {
+    background: linear-gradient(#c08bff, #6125bd);
+    border-color: #2b1059;
+  }
+  .sky .platform { background: linear-gradient(#ffffff, #c9f3ff); border-color: #5bb7d6; }
+  .miniCastle .platform { background: linear-gradient(#777, #333); border-color: #111; }
+
+  .pipe {
+    position: absolute;
+    width: 84px;
+    height: 100px;
+    bottom: 72px;
+    background: linear-gradient(90deg, #149e39, #39f06d, #149e39);
+    border: 5px solid #064f1e;
+    border-radius: 0 0 8px 8px;
+    z-index: 12;
+    box-shadow: 5px 5px 0 rgba(0,0,0,.25);
+  }
+  .pipe::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: -29px;
+    width: 112px;
+    height: 37px;
+    background: linear-gradient(90deg, #16aa3d, #45ff7a, #16aa3d);
+    border: 5px solid #064f1e;
+    border-radius: 10px;
+  }
+
+  .coin {
+    position: absolute;
+    width: 28px;
+    height: 36px;
+    background: #ffd21f;
+    border: 4px solid #9d7a00;
+    border-radius: 50%;
+    z-index: 20;
+    animation: coinSpin .7s infinite alternate;
+    box-shadow: 0 0 14px rgba(255,230,50,.8);
+  }
+  @keyframes coinSpin { from { transform: scaleX(1); } to { transform: scaleX(.35); } }
+
+  .enemy {
+    position: absolute;
+    width: 50px;
+    height: 42px;
+    bottom: 72px;
+    background: linear-gradient(#a96634, #7c3f1d);
+    border: 4px solid #111;
+    border-radius: 50% 50% 12px 12px;
+    z-index: 22;
+    box-shadow: 5px 5px 0 rgba(0,0,0,.25);
+  }
+  .enemy::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 12px;
+    width: 7px;
+    height: 7px;
+    background: #111;
+    border-radius: 50%;
+    box-shadow: 22px 0 #111;
+  }
+  .enemy::after {
+    content: "";
+    position: absolute;
+    left: -4px;
+    bottom: -12px;
+    width: 23px;
+    height: 12px;
+    background: #111;
+    border-radius: 12px;
+    box-shadow: 33px 0 #111;
+  }
+
+  .boss {
+    position: absolute;
+    width: 162px;
+    height: 140px;
+    bottom: 72px;
+    background: linear-gradient(#8d4de8, #3b146f);
+    border: 6px solid #111;
+    border-radius: 38px;
+    z-index: 25;
+    box-shadow: 8px 8px 0 rgba(0,0,0,.35);
+  }
+  .boss::before {
+    content: "👑";
+    position: absolute;
+    left: 53px;
+    top: -54px;
+    font-size: 52px;
+  }
+  .boss::after {
+    content: "😠";
+    position: absolute;
+    left: 46px;
+    top: 36px;
+    font-size: 60px;
+  }
+  .bossHp {
+    position: absolute;
+    top: -36px;
+    left: 0;
+    width: 162px;
+    height: 19px;
+    background: #fff;
+    border: 3px solid #111;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .bossHpFill { height: 100%; width: 100%; background: linear-gradient(90deg,#ff3030,#ff9b30); }
+
+  .flag {
+    position: absolute;
+    width: 15px;
+    height: 192px;
+    background: #111;
+    bottom: 72px;
+    left: 4100px;
+    z-index: 24;
+  }
+  .flag::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: -78px;
+    width: 78px;
+    height: 48px;
+    background: repeating-linear-gradient(45deg, white 0 10px, #111 10px 20px);
+    border: 3px solid #111;
+    border-radius: 4px;
+  }
+
+  #player {
+    position: absolute;
+    left: 80px;
+    top: 398px;
+    width: 62px;
+    height: 120px;
+    z-index: 30;
+    transform-origin: center bottom;
+    filter: drop-shadow(6px 7px 0 rgba(0,0,0,.25));
+  }
+  .mario-part { position: absolute; }
+  .hat {
+    left: 10px; top: 1px; width: 44px; height: 18px;
+    background: linear-gradient(#ff5555, #cf1111);
+    border: 4px solid #111;
+    border-radius: 14px 14px 3px 3px;
+  }
+  .hat::after {
+    content: "";
+    position: absolute;
+    left: 30px; top: 8px; width: 24px; height: 10px;
+    background: #cf1111; border: 4px solid #111; border-left: 0; border-radius: 0 10px 10px 0;
+  }
+  .face {
+    left: 11px; top: 20px; width: 42px; height: 34px;
+    background: #f2ba82; border: 4px solid #111; border-radius: 10px;
+  }
+  .ear {
+    left: 2px; top: 31px; width: 14px; height: 18px;
+    background: #f2ba82; border: 4px solid #111; border-right: 0; border-radius: 8px 0 0 8px;
+  }
+  .eye { left: 40px; top: 31px; width: 6px; height: 9px; background: #111; border-radius: 50%; z-index: 3; }
+  .nose {
+    left: 39px; top: 39px; width: 18px; height: 13px;
+    background: #f2ba82; border: 4px solid #111; border-radius: 50%; z-index: 4;
+  }
+  .mustache {
+    left: 23px; top: 50px; width: 34px; height: 10px;
+    background: #44200e; border: 3px solid #111; border-radius: 10px; z-index: 5;
+  }
+  .shirt {
+    left: 8px; top: 60px; width: 48px; height: 30px;
+    background: linear-gradient(#ff5555, #d41414); border: 4px solid #111; border-radius: 9px;
+  }
+  .arm {
+    top: 64px; width: 15px; height: 34px;
+    background: #d41414; border: 4px solid #111; border-radius: 8px;
+  }
+  .arm.left { left: -4px; }
+  .arm.right { right: -4px; }
+  .glove {
+    top: 93px; width: 18px; height: 16px;
+    background: white; border: 4px solid #111; border-radius: 50%; z-index: 6;
+  }
+  .glove.left { left: -6px; }
+  .glove.right { right: -6px; }
+  .overalls {
+    left: 13px; top: 73px; width: 36px; height: 38px;
+    background: linear-gradient(#3c8cff, #0c48b8); border: 4px solid #111; border-radius: 6px; z-index: 4;
+  }
+  .overalls::before {
+    content: "";
+    position: absolute;
+    left: 3px; top: -18px; width: 8px; height: 22px;
+    background: #3c8cff; border: 3px solid #111; border-bottom: 0; box-shadow: 17px 0 #3c8cff;
+  }
+  .button1, .button2 {
+    top: 84px; width: 8px; height: 8px;
+    background: #ffdf28; border: 2px solid #111; border-radius: 50%; z-index: 8;
+  }
+  .button1 { left: 20px; }
+  .button2 { left: 34px; }
+  .leg {
+    bottom: 7px; width: 23px; height: 19px;
+    background: #0c48b8; border: 4px solid #111; z-index: 3; border-radius: 5px;
+  }
+  .leg.left { left: 9px; }
+  .leg.right { right: 9px; }
+  .shoe {
+    bottom: 0px; width: 27px; height: 13px;
+    background: #5a2b15; border: 4px solid #111; border-radius: 9px; z-index: 7;
+  }
+  .shoe.left { left: 4px; }
+  .shoe.right { right: 4px; }
+
+
+  .powerup {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    z-index: 21;
+    border: 4px solid #111;
+    box-shadow: 5px 5px 0 rgba(0,0,0,.25);
+    animation: powerFloat .8s infinite alternate;
+  }
+
+  .mushroomPower {
+    background: radial-gradient(circle at 30% 30%, #fff, #ff3b3b 45%, #b50000);
+    border-radius: 50% 50% 35% 35%;
+  }
+
+  .mushroomPower::before {
+    content: "🍄";
+    position: absolute;
+    font-size: 33px;
+    left: 2px;
+    top: -4px;
+  }
+
+  .starPower {
+    background: radial-gradient(circle at 35% 35%, #fff7a3, #ffd21f 55%, #c79500);
+    clip-path: polygon(50% 0%, 61% 34%, 98% 35%, 68% 56%, 79% 91%, 50% 70%, 21% 91%, 32% 56%, 2% 35%, 39% 34%);
+  }
+
+  .starPower::before {
+    content: "⭐";
+    position: absolute;
+    font-size: 31px;
+    left: 1px;
+    top: 1px;
+  }
+
+  @keyframes powerFloat {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
+  }
+
+  #player.big {
+    transform-origin: center bottom;
+  }
+
+  #player.starMode {
+    animation: rainbowPlayer .25s infinite linear;
+  }
+
+  @keyframes rainbowPlayer {
+    0% { filter: hue-rotate(0deg) drop-shadow(0 0 10px #fff); }
+    25% { filter: hue-rotate(90deg) drop-shadow(0 0 15px #ffff00); }
+    50% { filter: hue-rotate(180deg) drop-shadow(0 0 15px #00ffff); }
+    75% { filter: hue-rotate(270deg) drop-shadow(0 0 15px #ff00ff); }
+    100% { filter: hue-rotate(360deg) drop-shadow(0 0 10px #fff); }
+  }
+
+  #help {
+    width: 1020px;
+    margin: -3px auto 0;
+    color: white;
+    text-align: center;
+    font-size: 18px;
+    direction: rtl;
+    opacity: .9;
+  }
+</style>
+  <link rel="stylesheet" href="assets/css/treasure_hunt.css">
+</head>
+<body>
+
+<div id="game" class="grass">
+  <div id="hud">
+    <div class="hudChip">🌍 עולם: <span id="worldText">1</span> - <span id="worldNameText">דשא</span></div>
+    <div class="hudChip">🚩 שלב: <span id="stageText">1</span>/4</div>
+    <div class="hudChip">🪙 <span id="coinsText">0</span></div>
+    <div class="hudChip">❤️ <span id="livesText">3</span></div>
+    <div class="hudChip">כוח: <span id="powerText">רגיל</span></div>
+  </div>
+
+  <div id="message"></div>
+
+  <div id="startScreen">
+    <div id="startBox">
+      <h1>משחק פלטפורמה מודרני</h1>
+      <div class="subtitle">8 עולמות, 4 שלבים בכל עולם, ובשלב 4 יש טירה קטנה עם בוס.</div>
+
+      <div class="instructionsGrid">
+        <div class="instructionCard"><span>⬅️ ➡️</span> חצים ימינה ושמאלה — לזוז</div>
+        <div class="instructionCard"><span>רווח</span> קפיצה</div>
+        <div class="instructionCard"><span>אויבים</span> קופצים עליהם מלמעלה כדי לנצח</div>
+        <div class="instructionCard"><span>מטבעות</span> אסוף כמה שיותר מטבעות</div>
+        <div class="instructionCard"><span>דגל</span> מגיעים לדגל כדי לעבור שלב</div>
+        <div class="instructionCard"><span>בוס</span> בשלב 4 קופצים על הבוס 3 פעמים</div>
+        <div class="instructionCard"><span>🍄</span> פטרייה מגדילה אותך</div>
+        <div class="instructionCard"><span>⭐</span> כוכב עושה אותך צבעוני ובלתי פגיע לכמה שניות</div>
+      </div>
+
+      <p><b>R</b> = התחלה מחדש אחרי הפסד</p>
+      <button id="startButton">התחל לשחק</button>
+    </div>
+  </div>
+
+  <div id="world"></div>
+</div>
+
+<div id="help">הוראות מופיעות במסך הפתיחה. חצים לזוז, רווח לקפוץ.</div>
+
+<script>
+const game = document.getElementById("game");
+const worldEl = document.getElementById("world");
+const hud = document.getElementById("hud");
+const message = document.getElementById("message");
+const startScreen = document.getElementById("startScreen");
+const startButton = document.getElementById("startButton");
+
+const worldText = document.getElementById("worldText");
+const worldNameText = document.getElementById("worldNameText");
+const stageText = document.getElementById("stageText");
+const coinsText = document.getElementById("coinsText");
+const livesText = document.getElementById("livesText");
+const powerText = document.getElementById("powerText");
+
+const SCREEN_W = 1020;
+const WORLD_W = 4300;
+const GAME_H = 590;
+const GROUND_H = 72;
+const PLAYER_W = 62;
+const PLAYER_H = 120;
+const GROUND_Y = GAME_H - GROUND_H - PLAYER_H;
+
+const worlds = [
+  { name: "דשא", theme: "grass", decor: "hill", castleColors:["#7ed7ff","#3264a8","#ff6a1a","#a91800","#999","#555"] },
+  { name: "מדבר", theme: "desert", decor: "pyramid", castleColors:["#f7c96b","#b46b2a","#ff9a18","#b84200","#d7a24b","#8b5a20"] },
+  { name: "חוף ים", theme: "beach", decor: "palm", castleColors:["#4ecfff","#126e96","#ff7a2d","#a82d00","#57b7d9","#1d6f8f"] },
+  { name: "שלג", theme: "snow", decor: "snowHill", castleColors:["#dff8ff","#7fb8d6","#ff5b2a","#9b1805","#e6f7ff","#8abed4"] },
+  { name: "יער", theme: "forest", decor: "tree", castleColors:["#1d5b2b","#102f18","#ff711f","#9b2100","#2d8a44","#165423"] },
+  { name: "הרים", theme: "mountains", decor: "mountain", castleColors:["#777b82","#333841","#ff6722","#9a1900","#8b8f9b","#4b505b"] },
+  { name: "שמים", theme: "sky", decor: "cloudDecor", castleColors:["#aeefff","#4ba6d9","#ff8b2c","#b12d00","#ffffff","#9edff5"] },
+  { name: "הטירה של הנסיכה", theme: "castle", decor: "castleTower", castleColors:["#ffc0e0","#7a4bc4","#ff5c25","#9a1600","#ff9bd2","#9f62df"] }
+];
+
+let currentWorld = 1;
+let currentStage = 1;
+let coins = 0;
+let lives = 3;
+
+let x = 80;
+let y = GROUND_Y;
+let vx = 0;
+let vy = 0;
+let cameraX = 0;
+let onGround = true;
+let started = false;
+let gameOver = false;
+let facingRight = true;
+let bossHits = 0;
+let isBig = false;
+let starActive = false;
+let starTimer = 0;
+
+const keys = {};
+const gravity = 0.78;
+const speed = 4.9;
+const jumpPower = -15.5;
+
+const layouts = {
+  1: {
+    blocks: [[300,255,"question"],[354,255,"block"],[408,255,"question"],[730,325,"platform"],[784,325,"platform"],[1090,250,"question"],[1144,250,"block"],[1198,250,"block"],[1560,335,"platform"],[1614,335,"platform"],[1668,335,"platform"],[2160,260,"question"],[2214,260,"block"],[2268,260,"question"],[2970,315,"platform"],[3024,315,"platform"],[3078,315,"platform"]],
+    coins: [[320,215],[430,215],[770,285],[860,340],[1115,208],[1320,340],[1620,292],[1870,340],[2190,220],[2470,340],[3010,270],[3200,340],[3540,340]],
+    powerups: [[650,280,"mushroomPower"],[1760,292,"starPower"]],
+    enemies: [[530,null],[830,null],[1260,null],[2070,null],[3020,null]],
+    pipes: [950, 2000, 3380]
+  },
+  2: {
+    blocks: [[260,320,"platform"],[314,320,"platform"],[530,260,"question"],[830,300,"platform"],[884,300,"platform"],[938,300,"platform"],[1230,240,"block"],[1284,240,"question"],[1338,240,"block"],[1800,350,"platform"],[1854,350,"platform"],[2370,270,"question"],[2424,270,"question"],[2870,230,"platform"],[2924,230,"platform"],[2978,230,"platform"],[3420,310,"block"],[3474,310,"question"]],
+    coins: [[280,280],[345,280],[550,220],[860,260],[920,260],[1280,200],[1830,310],[2400,230],[2910,190],[2960,190],[3200,340],[3450,270],[3640,340]],
+    powerups: [[1030,250,"starPower"],[2550,230,"mushroomPower"]],
+    enemies: [[610,null],[1120,null],[1520,null],[2270,null],[2720,null],[3330,null]],
+    pipes: [720, 1720, 3120]
+  },
+  3: {
+    blocks: [[370,230,"question"],[424,230,"question"],[630,340,"platform"],[684,340,"platform"],[738,340,"platform"],[1010,290,"block"],[1064,290,"block"],[1118,290,"question"],[1520,245,"platform"],[1574,245,"platform"],[1970,325,"platform"],[2024,325,"platform"],[2078,325,"platform"],[2500,260,"question"],[2554,260,"block"],[3120,225,"platform"],[3174,225,"platform"],[3228,225,"platform"]],
+    coins: [[390,190],[445,190],[660,300],[715,300],[1050,250],[1550,205],[2000,285],[2050,285],[2520,220],[2850,340],[3150,185],[3210,185],[3560,340]],
+    powerups: [[880,300,"mushroomPower"],[2300,285,"starPower"]],
+    enemies: [[490,null],[920,null],[1370,null],[1800,null],[2400,null],[2940,null],[3480,null]],
+    pipes: [1200, 2220, 3670]
+  },
+  4: {
+    blocks: [[310,320,"platform"],[364,320,"platform"],[710,270,"platform"],[764,270,"platform"],[818,270,"platform"],[1130,325,"platform"],[1184,325,"platform"],[1610,250,"platform"],[1664,250,"platform"],[1718,250,"platform"],[2220,320,"platform"],[2274,320,"platform"],[2770,265,"platform"],[2824,265,"platform"],[2878,265,"platform"]],
+    coins: [[330,280],[750,230],[800,230],[1170,285],[1650,210],[1695,210],[2260,280],[2805,225],[2855,225],[3140,340],[3640,340]],
+    powerups: [[930,230,"mushroomPower"],[3000,220,"starPower"]],
+    enemies: [[520,null],[970,null],[1420,null],[2070,null],[2520,null]],
+    pipes: []
+  }
+};
+
+function playerHTML() {
+  return `
+    <div id="player">
+      <div class="mario-part hat"></div><div class="mario-part face"></div><div class="mario-part ear"></div>
+      <div class="mario-part eye"></div><div class="mario-part nose"></div><div class="mario-part mustache"></div>
+      <div class="mario-part shirt"></div><div class="mario-part arm left"></div><div class="mario-part arm right"></div>
+      <div class="mario-part glove left"></div><div class="mario-part glove right"></div><div class="mario-part overalls"></div>
+      <div class="mario-part button1"></div><div class="mario-part button2"></div>
+      <div class="mario-part leg left"></div><div class="mario-part leg right"></div>
+      <div class="mario-part shoe left"></div><div class="mario-part shoe right"></div>
+    </div>
+  `;
+}
+
+function div(cls, left, top, content = "") {
+  const yStyle = top === null ? "" : `top:${top}px;`;
+  return `<div class="${cls}" style="left:${left}px; ${yStyle}">${content}</div>`;
+}
+
+function setCastleStyle(w) {
+  const c = w.castleColors;
+  game.style.setProperty("--castleSky1", c[0]);
+  game.style.setProperty("--castleSky2", c[1]);
+  game.style.setProperty("--lava1", c[2]);
+  game.style.setProperty("--lava2", c[3]);
+  game.style.setProperty("--tower1", c[4]);
+  game.style.setProperty("--tower2", c[5]);
+}
+
+function buildStage() {
+  bossHits = 0;
+  isBig = false;
+  starActive = false;
+  starTimer = 0;
+  updatePowerHud();
+  const w = worlds[currentWorld - 1];
+  const isCastleStage = currentStage === 4;
+
+  if (isCastleStage) {
+    game.className = "miniCastle";
+    setCastleStyle(w);
+  } else {
+    game.className = w.theme;
+  }
+
+  worldText.textContent = currentWorld;
+  worldNameText.textContent = w.name;
+  stageText.textContent = currentStage;
+
+  const layout = layouts[currentStage];
+  let html = playerHTML();
+
+  if (isCastleStage) {
+    [350, 1200, 2450, 3500].forEach(pos => html += `<div class="miniTower" style="left:${pos}px;"></div>`);
+    [560, 980, 1500, 2100, 2660, 3300].forEach(pos => html += div("lavaBubble", pos, null));
+  } else {
+    [110, 920, 1880, 3150].forEach(pos => html += div("decor " + w.decor, pos, null));
+  }
+
+  layout.blocks.forEach(b => html += div(b[2], b[0], b[1], b[2] === "question" ? "?" : ""));
+  layout.coins.forEach(c => html += div("coin", c[0], c[1]));
+  layout.powerups.forEach(p => html += div("powerup " + p[2], p[0], p[1]));
+
+  if (!isCastleStage && currentWorld !== 7) {
+    layout.pipes.forEach((p, index) => {
+      if (index === 1) html += `<div class="pipe" style="left:${p}px; height:130px;"></div>`;
+      else html += div("pipe", p, null);
+    });
+  }
+
+  if (isCastleStage) {
+    layout.enemies.forEach(p => html += div("enemy", p[0], p[1]));
+    html += `<div class="boss" id="boss" style="left:3450px;"><div class="bossHp"><div class="bossHpFill" id="bossHpFill"></div></div></div>`;
+  } else {
+    layout.enemies.forEach(p => html += div("enemy", p[0], p[1]));
+    html += div("flag", 4100, null);
+  }
+
+  html += `<div class="ground"></div>`;
+  worldEl.innerHTML = html;
+
+  x = 80;
+  y = GROUND_Y;
+  vy = 0;
+  vx = 0;
+  cameraX = 0;
+  onGround = true;
+  gameOver = false;
+  message.style.display = "none";
+  worldEl.style.left = "0px";
+  updatePlayerPosition();
+}
+
+
+function updatePowerHud() {
+  if (!powerText) return;
+  if (starActive) {
+    powerText.textContent = "כוכב ⭐";
+  } else if (isBig) {
+    powerText.textContent = "גדול 🍄";
+  } else {
+    powerText.textContent = "רגיל";
+  }
+}
+
+function activateMushroom() {
+  isBig = true;
+  const player = document.getElementById("player");
+  if (player) player.classList.add("big");
+  updatePowerHud();
+}
+
+function activateStar() {
+  starActive = true;
+  starTimer = 420; // בערך 7 שניות
+  const player = document.getElementById("player");
+  if (player) player.classList.add("starMode");
+  updatePowerHud();
+}
+
+function turnOffStar() {
+  starActive = false;
+  starTimer = 0;
+  const player = document.getElementById("player");
+  if (player) player.classList.remove("starMode");
+  updatePowerHud();
+}
+
+function updatePlayerPosition() {
+  const player = document.getElementById("player");
+  if (!player) return;
+  player.style.left = x + "px";
+  player.style.top = y + "px";
+  const sizeScale = isBig ? 1.18 : 1;
+  player.style.transform = facingRight ? `scale(${sizeScale})` : `scale(${-sizeScale}, ${sizeScale})`;
+}
+
+function hit(a, b) {
+  const ar = a.getBoundingClientRect();
+  const br = b.getBoundingClientRect();
+  return !(ar.right < br.left || ar.left > br.right || ar.bottom < br.top || ar.top > br.bottom);
+}
+
+function showMessage(text) {
+  message.innerHTML = text;
+  message.style.display = "block";
+}
+
+function hurtPlayer() {
+  lives--;
+  livesText.textContent = lives;
+
+  if (lives <= 0) {
+    gameOver = true;
+    showMessage("הפסדת!<br>לחץ R להתחלה מחדש");
+    return;
+  }
+
+  x = Math.max(80, x - 220);
+  y = GROUND_Y;
+  vy = 0;
+  onGround = true;
+  updatePlayerPosition();
+}
+
+function nextStage() {
+  currentStage++;
+  if (currentStage > 4) {
+    currentStage = 1;
+    currentWorld++;
+  }
+
+  if (currentWorld > 8) {
+    gameOver = true;
+    showMessage("ניצחת את כל 8 העולמות! 👑🎉");
+    return;
+  }
+
+  const w = worlds[currentWorld - 1];
+  showMessage(`עברת!<br>עולם ${currentWorld}: ${w.name}<br>שלב ${currentStage}/4`);
+
+  setTimeout(() => {
+    buildStage();
+    if (started) requestAnimationFrame(update);
+  }, 900);
+}
+
+function resetGame() {
+  currentWorld = 1;
+  currentStage = 1;
+  coins = 0;
+  lives = 3;
+  coinsText.textContent = coins;
+  livesText.textContent = lives;
+  gameOver = false;
+  isBig = false;
+  turnOffStar();
+  buildStage();
+}
+
+function update() {
+  if (!started || gameOver) return;
+
+  vx = 0;
+  if (keys["ArrowLeft"]) { vx = -speed; facingRight = false; }
+  if (keys["ArrowRight"]) { vx = speed; facingRight = true; }
+
+  x += vx;
+  vy += gravity;
+  y += vy;
+
+  if (y >= GROUND_Y) {
+    y = GROUND_Y;
+    vy = 0;
+    onGround = true;
+  }
+
+  if (x < 0) x = 0;
+  if (x > WORLD_W - PLAYER_W) x = WORLD_W - PLAYER_W;
+
+  cameraX = x - 390;
+  if (cameraX < 0) cameraX = 0;
+  if (cameraX > WORLD_W - SCREEN_W) cameraX = WORLD_W - SCREEN_W;
+
+  worldEl.style.left = -cameraX + "px";
+  updatePlayerPosition();
+
+  const player = document.getElementById("player");
+
+  if (starActive) {
+    starTimer--;
+    if (starTimer <= 0) turnOffStar();
+  }
+
+  document.querySelectorAll(".powerup").forEach(powerEl => {
+    if (powerEl.style.display !== "none" && hit(player, powerEl)) {
+      if (powerEl.classList.contains("mushroomPower")) activateMushroom();
+      if (powerEl.classList.contains("starPower")) activateStar();
+      powerEl.style.display = "none";
+    }
+  });
+
+  document.querySelectorAll(".coin").forEach(coinEl => {
+    if (coinEl.style.display !== "none" && hit(player, coinEl)) {
+      coinEl.style.display = "none";
+      coins++;
+      coinsText.textContent = coins;
+    }
+  });
+
+  document.querySelectorAll(".enemy").forEach(enemy => {
+    if (enemy.style.display === "none" || !hit(player, enemy)) return;
+
+    const pr = player.getBoundingClientRect();
+    const er = enemy.getBoundingClientRect();
+    const stomp = vy > 0 && pr.bottom - er.top < 32;
+
+    if (starActive) {
+      enemy.style.display = "none";
+      vy = -6;
+    } else if (stomp) {
+      enemy.style.display = "none";
+      vy = -10;
+    } else {
+      if (isBig) {
+        isBig = false;
+        updatePowerHud();
+        x = Math.max(80, x - 120);
+      } else {
+        hurtPlayer();
+      }
+    }
+  });
+
+  const boss = document.getElementById("boss");
+  if (boss && boss.style.display !== "none" && hit(player, boss)) {
+    const pr = player.getBoundingClientRect();
+    const br = boss.getBoundingClientRect();
+    const stompBoss = vy > 0 && pr.bottom - br.top < 35;
+
+    if (starActive || stompBoss) {
+      bossHits++;
+      vy = -12;
+
+      const fill = document.getElementById("bossHpFill");
+      if (fill) fill.style.width = Math.max(0, 100 - bossHits * 34) + "%";
+
+      if (bossHits >= 3) {
+        boss.style.display = "none";
+        gameOver = true;
+        showMessage("ניצחת את הבוס!");
+        setTimeout(nextStage, 900);
+      } else {
+        x -= 80;
+      }
+    } else {
+      if (isBig) {
+        isBig = false;
+        updatePowerHud();
+        x = Math.max(80, x - 120);
+      } else {
+        hurtPlayer();
+      }
+    }
+  }
+
+  if (x > 4070 && currentStage !== 4) {
+    gameOver = true;
+    showMessage("הגעת לדגל!");
+    setTimeout(nextStage, 700);
+  }
+
+  requestAnimationFrame(update);
+}
+
+document.addEventListener("keydown", (e) => {
+  keys[e.code] = true;
+
+  if ((e.code === "Enter" || e.code === "Space") && !started) {
+    startButton.click();
+    return;
+  }
+
+  if (e.code === "Space" && onGround && started && !gameOver) {
+    vy = jumpPower;
+    onGround = false;
+  }
+
+  if (e.code === "KeyR" && gameOver) {
+    resetGame();
+    gameOver = false;
+    requestAnimationFrame(update);
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  keys[e.code] = false;
+});
+
+startButton.addEventListener("click", () => {
+  started = true;
+  startScreen.style.display = "none";
+  hud.style.display = "flex";
+  buildStage();
+  requestAnimationFrame(update);
+});
+
+buildStage();
+</script>
+  <script src="js/treasure_hunt.js" defer></script>
+</body>
+</html>

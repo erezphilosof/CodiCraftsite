@@ -1,0 +1,9 @@
+export function initClients() {
+    const track = document.querySelector('.client-track'); const container = document.querySelector('.client-grid'); if (!track || !container || container.dataset.initialized === 'true') return; container.dataset.initialized = 'true'; const originalItems = Array.from(track.children); const itemWidth = 230; const totalOriginalWidth = originalItems.length * itemWidth; originalItems.forEach(item => track.appendChild(item.cloneNode(!0))); originalItems.forEach(item => track.appendChild(item.cloneNode(!0))); let xPos = -totalOriginalWidth; let baseSpeed = 0.7; let direction = 1; let userSpeed = 0; let isDragging = !1; let isActive = !1; let rAF = null; function update() {
+        if (!isActive) return; if (!isDragging) { userSpeed *= 0.95; if (Math.abs(userSpeed) < 0.1) userSpeed = 0; const speed = (baseSpeed * direction) + userSpeed; xPos -= speed }
+        if (xPos > 0) { xPos -= totalOriginalWidth }
+        if (xPos < -totalOriginalWidth * 2) { xPos += totalOriginalWidth }
+        track.style.transform = `translate3d(${xPos}px, 0, 0)`; rAF = requestAnimationFrame(update)
+    }
+    const hammer = new Hammer(container); hammer.on('panstart', () => { isDragging = !0; userSpeed = 0; if (!isActive) { isActive = !0; update() } }); hammer.on('pan', (e) => { isDragging = !0; xPos += e.velocityX * 15; if (e.velocityX > 0) { direction = -1 } else if (e.velocityX < 0) { direction = 1 } }); hammer.on('panend', (e) => { isDragging = !1; userSpeed = -(e.velocityX * 10) }); const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { if (!isActive) { isActive = !0; update() } } else { isActive = !1; if (rAF) cancelAnimationFrame(rAF); } }) }, { threshold: 0 }); observer.observe(container)
+}

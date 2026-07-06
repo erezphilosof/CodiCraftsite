@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🏆 קרב קלפי הסופר-סטארס</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle, #1a1528, #0b0713);
+    font-family: 'Rubik', sans-serif;
+    color: #fff;
+    overflow: hidden;
+    text-align: center;
+    direction: rtl;
+  }
+  
+  header {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-bottom: 2px solid #ffcc00;
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #ffcc00;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.6);
+  }
+  
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    justify-content: space-between;
+    padding: 10px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .arena {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-grow: 1;
+    position: relative;
+    padding: 15px 0;
+  }
+
+  .hp-bar-container {
+    width: 200px;
+    background: #444;
+    border-radius: 10px;
+    border: 2px solid #fff;
+    overflow: hidden;
+    margin-bottom: 5px;
+  }
+  .hp-bar {
+    height: 16px;
+    background: #00ff66;
+    width: 100%;
+    transition: width 0.3s ease;
+  }
+  .hp-text {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-top: 2px;
+  }
+
+  .fighter-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 220px;
+  }
+  .fighter-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .card-placeholder {
+    width: 140px;
+    height: 200px;
+    border: 3px dashed #666;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    color: #666;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .card-display {
+    width: 140px;
+    height: 200px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    border: 3px solid #ffcc00;
+    box-shadow: 0px 5px 15px rgba(255, 204, 0, 0.4);
+    position: relative;
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+
+  .card-display.attacker {
+    animation: attackLeft 0.5s ease-in-out;
+  }
+  .card-display.opponent-attacker {
+    animation: attackRight 0.5s ease-in-out;
+  }
+  .card-display.hit {
+    animation: shake 0.3s ease-in-out;
+    filter: brightness(1.5) sepia(1) hue-rotate(-50deg);
+  }
+
+  @keyframes attackLeft {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-40px) scale(1.1); }
+    100% { transform: translateX(0); }
+  }
+  @keyframes attackRight {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(40px) scale(1.1); }
+    100% { transform: translateX(0); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  .floating-dmg {
+    position: absolute;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #ff3300;
+    text-shadow: 0 0 10px #000;
+    animation: floatUp 1.2s ease-out forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .floating-heal {
+    position: absolute;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #00ff66;
+    text-shadow: 0 0 10px #000;
+    animation: floatUp 1.2s ease-out forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-80px); opacity: 0; }
+  }
+
+  .versus {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #ff3300;
+    text-shadow: 0 0 10px rgba(255, 51, 0, 0.8);
+    font-style: italic;
+  }
+
+  .player-hand-section {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px 16px 0 0;
+    padding: 12px;
+    border-top: 3px solid #ffcc00;
+  }
+  .hand-title {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #ffcc00;
+  }
+  
+  .cards-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .card-item {
+    width: 100px;
+    height: 145px;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #555;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  .card-item:hover {
+    transform: translateY(-8px) scale(1.05);
+    border-color: #ffcc00;
+    box-shadow: 0 5px 12px rgba(255, 204, 0, 0.5);
+  }
+  .card-item.selected {
+    border-color: #ffcc00;
+    box-shadow: 0 0 15px #ffcc00;
+    transform: translateY(-10px) scale(1.08);
+  }
+
+  .battle-btn {
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #ffcc00, #ff8800);
+    color: #000;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255, 136, 0, 0.4);
+    margin: 10px auto;
+    display: inline-block;
+    transition: transform 0.1s, box-shadow 0.2s;
+  }
+  .battle-btn:hover {
+    box-shadow: 0 8px 20px rgba(255, 136, 0, 0.6);
+  }
+  .battle-btn:active {
+    transform: scale(0.96);
+  }
+  .battle-btn:disabled {
+    background: #555;
+    color: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  #console {
+    font-size: 0.95rem;
+    color: #ffd966;
+    min-height: 24px;
+    margin: 6px 0;
+    font-weight: bold;
+  }
+
+  .game-over-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+  }
+  .game-over-title {
+    font-size: 2.5rem;
+    color: #ffcc00;
+    margin-bottom: 15px;
+    text-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
+  }
+  .game-over-btn {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #ffcc00;
+    color: #000;
+    cursor: pointer;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏆 קרב קלפי הסופר-סטארס של איתן</h1>
+</header>
+
+<div class="game-container">
+  <!-- HUD: Health bars -->
+  <div style="display: flex; justify-content: space-around; width: 100%; margin-top: 10px;">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <div class="hp-bar-container">
+        <div id="player-hp" class="hp-bar"></div>
+      </div>
+      <div class="hp-text">שחקן: <span id="player-hp-val">500</span>/500</div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <div class="hp-bar-container">
+        <div id="enemy-hp" class="hp-bar"></div>
+      </div>
+      <div class="hp-text">יריב: <span id="enemy-hp-val">500</span>/500</div>
+    </div>
+  </div>
+
+  <!-- Arena: Fighters -->
+  <div class="arena">
+    <div id="float-effect-slot" style="position: absolute; width: 100%; height: 100%; pointer-events: none;"></div>
+    
+    <div class="fighter-slot">
+      <div class="fighter-title">הקלף שלך</div>
+      <div id="player-fighter-container">
+        <div class="card-placeholder">בחרו קלף...</div>
+      </div>
+    </div>
+
+    <div class="versus">נגד</div>
+
+    <div class="fighter-slot">
+      <div class="fighter-title">הקלף של היריב</div>
+      <div id="enemy-fighter-container">
+        <div class="card-placeholder">ממתין...</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="console">בחרו קלף מהיד שלכם למטה ולחצו על כפתור הקרב!</div>
+
+  <div style="text-align: center;">
+    <button id="battle-btn" class="battle-btn" disabled onclick="playRound()">קרב! ⚡</button>
+  </div>
+
+  <!-- Hand Section -->
+  <div class="player-hand-section">
+    <div class="hand-title">יד הקלפים שלכם (בחרו אחד):</div>
+    <div id="cards-hand" class="cards-row"></div>
+  </div>
+</div>
+
+<!-- Game Over Overlay -->
+<div id="game-over" class="game-over-overlay">
+  <div id="game-over-title" class="game-over-title">ניצחתם! 🎉</div>
+  <button class="game-over-btn" onclick="initGame()">שחקו שוב 🔄</button>
+</div>
+
+<script>
+// Web Audio Synth for retro sound effects
+let audioCtx = null;
+function playSound(type) {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    
+    if (type === 'select') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.1);
+      osc.start(now);
+      osc.stop(now + 0.1);
+    } else if (type === 'attack') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } else if (type === 'heal') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.4);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.4);
+      osc.start(now);
+      osc.stop(now + 0.4);
+    } else if (type === 'win') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+      osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+      osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.5);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    } else if (type === 'lose') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.linearRampToValueAtTime(100, now + 0.6);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.6);
+      osc.start(now);
+      osc.stop(now + 0.6);
+    }
+  } catch(e) {
+    console.log("Audio not supported or blocked");
+  }
+}
+
+const CARDS_DB = [
+  { id: 'messi', name: 'מסי', attack: 99, hp: 500, type: 'legend', img: '../img/gallery/kids_card_messi.jpg' },
+  { id: 'ronaldo', name: 'רונאלדו', attack: 97, hp: 500, type: 'legend', img: '../img/gallery/kids_card_ronaldo.jpg' },
+  { id: 'neymar', name: 'ניימאר', attack: 95, hp: 500, type: 'legend', img: '../img/gallery/kids_card_neymar.jpg' },
+  { id: 'pikachu', name: 'פיקאצ\'ו', attack: 89, hp: 500, type: 'pokemon', img: '../img/gallery/kids_card_pikachu.jpg' },
+  { id: 'charmander', name: 'צ\'רמנדר', attack: 92, hp: 500, type: 'pokemon', img: '../img/gallery/kids_card_charmander.jpg' },
+  { id: 'bulbasaur', name: 'בלבזאור', attack: 91, hp: 500, type: 'pokemon', img: '../img/gallery/kids_card_bulbasaur.jpg' },
+  { id: 'squirtle', name: 'סקווירטל', attack: 90, hp: 500, type: 'pokemon', img: '../img/gallery/kids_card_squirtle.jpg' },
+  { id: 'life_box', name: 'קופסת חיים', attack: 0, hp: 500, heal: 120, type: 'item', img: '../img/gallery/kids_card_life_box.jpg' }
+];
+
+let playerHP = 500;
+let enemyHP = 500;
+let selectedHandIndex = -1;
+let currentHand = [];
+
+const cardsHandEl = document.getElementById('cards-hand');
+const battleBtn = document.getElementById('battle-btn');
+const consoleEl = document.getElementById('console');
+const playerHPBar = document.getElementById('player-hp');
+const enemyHPBar = document.getElementById('enemy-hp');
+const playerHPVal = document.getElementById('player-hp-val');
+const enemyHPVal = document.getElementById('enemy-hp-val');
+const playerSlot = document.getElementById('player-fighter-container');
+const enemySlot = document.getElementById('enemy-fighter-container');
+const gameOverEl = document.getElementById('game-over');
+const gameOverTitle = document.getElementById('game-over-title');
+
+function initGame() {
+  playerHP = 500;
+  enemyHP = 500;
+  selectedHandIndex = -1;
+  gameOverEl.style.display = 'none';
+  
+  updateHPBars();
+  drawNewHand();
+  resetArena();
+  
+  consoleEl.textContent = "המשחק התחיל! בחרו קלף מהיד שלכם.";
+  battleBtn.disabled = true;
+}
+
+function updateHPBars() {
+  playerHP = Math.max(0, Math.min(500, playerHP));
+  enemyHP = Math.max(0, Math.min(500, enemyHP));
+  
+  playerHPVal.textContent = playerHP;
+  enemyHPVal.textContent = enemyHP;
+  
+  playerHPBar.style.width = (playerHP / 500 * 100) + '%';
+  enemyHPBar.style.width = (enemyHP / 500 * 100) + '%';
+  
+  if (playerHP > 250) playerHPBar.style.backgroundColor = '#00ff66';
+  else if (playerHP > 100) playerHPBar.style.backgroundColor = '#ffaa00';
+  else playerHPBar.style.backgroundColor = '#ff3300';
+  
+  if (enemyHP > 250) enemyHPBar.style.backgroundColor = '#00ff66';
+  else if (enemyHP > 100) enemyHPBar.style.backgroundColor = '#ffaa00';
+  else enemyHPBar.style.backgroundColor = '#ff3300';
+}
+
+function drawNewHand() {
+  currentHand = [];
+  cardsHandEl.innerHTML = '';
+  selectedHandIndex = -1;
+  battleBtn.disabled = true;
+  
+  for (let i = 0; i < 3; i++) {
+    const randCard = CARDS_DB[Math.floor(Math.random() * CARDS_DB.length)];
+    currentHand.push(randCard);
+    
+    const cardEl = document.createElement('div');
+    cardEl.className = 'card-item';
+    cardEl.style.backgroundImage = `url(${randCard.img})`;
+    cardEl.title = randCard.name + ` (${randCard.attack > 0 ? 'התקפה: ' + randCard.attack : 'ריפוי: ' + randCard.heal})`;
+    
+    cardEl.addEventListener('click', () => selectCard(i));
+    cardsHandEl.appendChild(cardEl);
+  }
+}
+
+function selectCard(index) {
+  playSound('select');
+  selectedHandIndex = index;
+  
+  const cards = cardsHandEl.querySelectorAll('.card-item');
+  cards.forEach((c, idx) => {
+    if (idx === index) c.classList.add('selected');
+    else c.classList.remove('selected');
+  });
+  
+  // Show in arena
+  const card = currentHand[index];
+  playerSlot.innerHTML = `<div class="card-display" style="background-image: url(${card.img});"></div>`;
+  
+  consoleEl.textContent = `בחרת את ${card.name}. לחצו קרב להתחלת הסיבוב!`;
+  battleBtn.disabled = false;
+}
+
+function resetArena() {
+  playerSlot.innerHTML = `<div class="card-placeholder">בחרו קלף...</div>`;
+  enemySlot.innerHTML = `<div class="card-placeholder">ממתין...</div>`;
+}
+
+function triggerDamageFloat(amount, slot, isHeal) {
+  const container = document.getElementById('float-effect-slot');
+  const rect = slot.getBoundingClientRect();
+  const gameRect = container.getBoundingClientRect();
+  
+  const x = rect.left - gameRect.left + rect.width / 2;
+  const y = rect.top - gameRect.top + rect.height / 2;
+  
+  const floatEl = document.createElement('div');
+  floatEl.className = isHeal ? 'floating-heal' : 'floating-dmg';
+  floatEl.textContent = (isHeal ? '+' : '-') + amount;
+  floatEl.style.left = (x - 20) + 'px';
+  floatEl.style.top = (y - 20) + 'px';
+  
+  container.appendChild(floatEl);
+  setTimeout(() => floatEl.remove(), 1200);
+}
+
+function playRound() {
+  if (selectedHandIndex === -1) return;
+  
+  battleBtn.disabled = true;
+  
+  // 1. Draw Enemy card
+  const enemyCard = CARDS_DB[Math.floor(Math.random() * CARDS_DB.length)];
+  enemySlot.innerHTML = `<div class="card-placeholder">מפענח...</div>`;
+  
+  // Start battle sequence
+  consoleEl.textContent = "מחשב מהלך...";
+  playSound('attack');
+  
+  setTimeout(() => {
+    // Show enemy card in arena
+    enemySlot.innerHTML = `<div class="card-display" style="background-image: url(${enemyCard.img});"></div>`;
+    
+    // Play animations
+    const pCard = playerSlot.querySelector('.card-display');
+    const eCard = enemySlot.querySelector('.card-display');
+    
+    pCard.classList.add('attacker');
+    
+    setTimeout(() => {
+      // Apply player attack
+      const pCardData = currentHand[selectedHandIndex];
+      let consoleMsg = "";
+      
+      if (pCardData.type === 'item') {
+        playerHP += pCardData.heal;
+        consoleMsg = `השתמשת בקופסת חיים וריפאת את עצמך ב-${pCardData.heal} חיים!`;
+        playSound('heal');
+        triggerDamageFloat(pCardData.heal, playerSlot, true);
+      } else {
+        enemyHP -= pCardData.attack;
+        consoleMsg = `קלף ${pCardData.name} שלך תקף והוריד ליריב ${pCardData.attack} חיים!`;
+        eCard.classList.add('hit');
+        triggerDamageFloat(pCardData.attack, enemySlot, false);
+      }
+      
+      updateHPBars();
+      consoleEl.textContent = consoleMsg;
+      
+      // Enemy counter attack
+      setTimeout(() => {
+        if (pCard) pCard.classList.remove('attacker');
+        if (eCard) {
+          eCard.classList.remove('hit');
+          eCard.classList.add('opponent-attacker');
+        }
+        
+        setTimeout(() => {
+          let enemyMsg = "";
+          if (enemyCard.type === 'item') {
+            enemyHP += enemyCard.heal;
+            enemyMsg = `היריב השתמש בקופסת חיים וריפא את עצמו ב-${enemyCard.heal} חיים!`;
+            playSound('heal');
+            triggerDamageFloat(enemyCard.heal, enemySlot, true);
+          } else {
+            playerHP -= enemyCard.attack;
+            enemyMsg = `היריב שיחק את ${enemyCard.name} והוריד לך ${enemyCard.attack} חיים!`;
+            if (pCard) pCard.classList.add('hit');
+            triggerDamageFloat(enemyCard.attack, playerSlot, false);
+          }
+          
+          updateHPBars();
+          consoleEl.textContent = consoleMsg + " | " + enemyMsg;
+          
+          setTimeout(() => {
+            if (pCard) pCard.classList.remove('hit');
+            if (eCard) eCard.classList.remove('opponent-attacker');
+            
+            // Check win/lose
+            if (playerHP <= 0 || enemyHP <= 0) {
+              endGame();
+            } else {
+              // Reset for next turn
+              drawNewHand();
+              resetArena();
+            }
+          }, 800);
+          
+        }, 300);
+        
+      }, 1200);
+      
+    }, 250);
+    
+  }, 800);
+}
+
+function endGame() {
+  if (playerHP <= 0 && enemyHP <= 0) {
+    gameOverTitle.textContent = "תיקו! 🤝";
+    playSound('lose');
+  } else if (playerHP <= 0) {
+    gameOverTitle.textContent = "הפסדתם! 😢";
+    playSound('lose');
+  } else {
+    gameOverTitle.textContent = "ניצחתם! 🎉";
+    playSound('win');
+  }
+  gameOverEl.style.display = 'flex';
+}
+
+// Start game
+initGame();
+</script>
+</body>
+</html>

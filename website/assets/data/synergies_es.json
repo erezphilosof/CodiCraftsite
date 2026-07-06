@@ -1,0 +1,50 @@
+{
+  "nodes": {
+    "dev": {
+      "title": "Desarrollo de Software",
+      "content": "<div class='synergy-desc-box'><p>Construcción de plataformas robustas y escalables utilizando tecnologías y lenguajes modernos. Diseñamos e implementamos software a medida adaptado a las necesidades de tu negocio.</p><ul><li>Arquitecturas limpias y mantenibles</li><li>Desarrollo frontend y backend moderno</li><li>Optimización de rendimiento y bases de datos</li></ul></div>"
+    },
+    "strat": {
+      "title": "Estrategia Digital",
+      "content": "<div class='synergy-desc-box'><p>Planificación y asesoramiento tecnológico para alinear tus procesos de negocio con las últimas tendencias digitales. Te ayudamos a definir el roadmap de tu transformación digital.</p><ul><li>Análisis de viabilidad tecnológica</li><li>Diseño de hojas de ruta digitales</li><li>Optimización de procesos internos</li></ul></div>"
+    },
+    "ia": {
+      "title": "IA Aplicada",
+      "content": "<div class='synergy-desc-box'><p>Diseño e implementación de modelos de inteligencia artificial y aprendizaje automático. Automatizamos tareas complejas y generamos predicciones de negocio precisas.</p><ul><li>Algoritmos de Machine Learning personalizados</li><li>Procesamiento de lenguaje natural y visión computacional</li><li>Integración de modelos predictivos en producción</li></ul></div>"
+    },
+    "cro": {
+      "title": "CRO (Optimización de la Conversión)",
+      "content": "<div class='synergy-desc-box'><p>Análisis exhaustivo del comportamiento del usuario en tus canales digitales para maximizar la tasa de conversión y el retorno de la inversión de tus campañas.</p><ul><li>Pruebas A/B multivariantes</li><li>Análisis de embudos de conversión</li><li>Optimización de la experiencia del usuario (UX)</li></ul></div>"
+    },
+    "flow": {
+      "title": "Flujos de Información",
+      "content": "<div class='synergy-desc-box'><p>Diseño e implementación de arquitecturas de datos que garantizan una conectividad óptima, segura y en tiempo real entre tus diferentes sistemas y departamentos.</p><ul><li>Integración de sistemas mediante APIs</li><li>Procesamiento y sincronización de datos en tiempo real</li><li>Seguridad y gobernanza del flujo de datos</li></ul></div>"
+    },
+    "ethics": {
+      "title": "Ética y Normativa (Compliance)",
+      "content": "<div class='synergy-desc-box'><p>Asesoramiento experto para asegurar que tus desarrollos tecnológicos y procesos de tratamiento de datos cumplen estrictamente con la legislación vigente y las directrices éticas.</p><ul><li>Cumplimiento de normativas de protección de datos (RGPD, etc.)</li><li>Auditoría ética de algoritmos e inteligencia artificial</li><li>Políticas de privacidad y gobernanza del riesgo tecnológico</li></ul></div>"
+    }
+  },
+  "synergies": {
+    "dev-ia": {
+      "title": "Desarrollo de Software Inteligente",
+      "content": "<p>Fusión de ingeniería de software con inteligencia artificial. Desarrollamos aplicaciones dotadas de algoritmos inteligentes y automatizaciones avanzadas capaces de aprender y adaptarse.</p>"
+    },
+    "cro-dev": {
+      "title": "Desarrollo Orientado a Conversión",
+      "content": "<p>Aplicación de prácticas sólidas de desarrollo web para optimizar de forma interactiva la conversión. Creamos código rápido, responsivo y adaptado para maximizar las conversiones de tu web.</p>"
+    },
+    "ia-strat": {
+      "title": "Estrategia de IA Empresarial",
+      "content": "<p>Convergencia estratégica de inteligencia artificial orientada al negocio. Diseñamos planes estratégicos para integrar modelos predictivos y optimizar la toma de decisiones corporativas.</p>"
+    },
+    "dev-strat": {
+      "title": "Desarrollo de Estrategias Tecnológicas",
+      "content": "<p>Alineación entre el desarrollo técnico a medida y la visión de negocio. Desarrollamos productos con un enfoque estratégico claro para garantizar su éxito en el mercado.</p>"
+    },
+    "cro-ia": {
+      "title": "Optimización Inteligente de Conversión",
+      "content": "<p>Uso de inteligencia artificial para personalizar dinámicamente la experiencia del usuario y optimizar las conversiones en tiempo real según el comportamiento detectado.</p>"
+    }
+  }
+}

@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Barnaby Purple Fish Flap Game - Shop Update</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0b1020;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+    }
+
+    h1 { margin: 12px; }
+
+    canvas {
+      background: linear-gradient(#224b7a, #07152b);
+      border: 5px solid white;
+      border-radius: 15px;
+      display: block;
+      margin: auto;
+    }
+
+    p { font-size: 18px; margin: 8px; }
+
+    button {
+      margin: 6px;
+      padding: 12px 18px;
+      font-size: 17px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #singleBtn { background: #a855f7; color: white; }
+    #multiBtn { background: #22d3ee; color: #06101f; }
+    #menuBtn { background: white; color: #111827; }
+    #soundBtn { background: #facc15; color: #111827; }
+    #shopBtn { background: #34d399; color: #052e16; }
+
+    #shopPanel {
+      max-width: 900px;
+      margin: 12px auto 22px auto;
+      background: rgba(0,0,0,0.45);
+      border: 3px solid white;
+      border-radius: 16px;
+      padding: 12px;
+      display: none;
+    }
+
+    .skinCard {
+      display: inline-block;
+      width: 185px;
+      min-height: 156px;
+      margin: 8px;
+      padding: 10px;
+      border: 2px solid rgba(255,255,255,0.75);
+      border-radius: 14px;
+      vertical-align: top;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .skinPreview {
+      width: 64px;
+      height: 42px;
+      margin: 4px auto 8px auto;
+      border-radius: 50%;
+      border: 3px solid white;
+    }
+
+    .skinCard button {
+      padding: 8px 10px;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .common { color: #e5e7eb; }
+    .uncommon { color: #86efac; }
+    .rare { color: #93c5fd; }
+    .epic { color: #d8b4fe; }
+    .mythic { color: #f0abfc; }
+    .legendary { color: #fde68a; }
+    .godly { color: #fdba74; }
+    .secret { color: #fca5a5; }
+  </style>
+  <link rel="stylesheet" href="assets/css/treasure_hunt.css">
+</head>
+<body>
+
+<h1>Barnaby: Purple Fish Flap Game - Shop Update</h1>
+<canvas id="game" width="500" height="650"></canvas>
+<p>SPACE/click/tap = flap. Collect yellow coins for 10 coins and green coins for 40 coins. Now with Godly skins in the shop!</p>
+
+<div>
+  <button id="singleBtn" onclick="startSingleplayer()">Singleplayer</button>
+  <button id="multiBtn" onclick="startMultiplayer()">Multiplayer Bots</button>
+  <button id="shopBtn" onclick="toggleShop()">Shop</button>
+  <button id="menuBtn" onclick="goMenu()">Menu</button>
+  <button id="soundBtn" onclick="toggleSound()">Sound: ON</button>
+</div>
+
+<div id="shopPanel"></div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const shopPanel = document.getElementById("shopPanel");
+
+let player;
+let bots;
+let walls;
+let coins;
+let floatingTexts;
+let score;
+let bestSingle;
+let bestMulti;
+let gameOver;
+let started;
+let frame;
+let wallSpeed;
+let screen;
+let mode;
+let soundOn = true;
+let audioCtx = null;
+
+bestSingle = Number(localStorage.getItem("barnaby_single_best_score") || 0);
+bestMulti = Number(localStorage.getItem("barnaby_multi_best_score") || 0);
+let totalCoins = Number(localStorage.getItem("barnaby_total_coins") || 0);
+
+const skins = [
+  { id:"classic", name:"Classic Barnaby", rarity:"common", price:0, body:"#9b5cff", dark:"#5b21b6", light:"#d8b4fe" },
+  { id:"lime", name:"Lime Splash", rarity:"common", price:80, body:"#84cc16", dark:"#3f6212", light:"#d9f99d" },
+  { id:"bubble", name:"Bubble Blue", rarity:"uncommon", price:160, body:"#38bdf8", dark:"#0369a1", light:"#bae6fd" },
+  { id:"melon", name:"Melon Fish", rarity:"uncommon", price:240, body:"#fb7185", dark:"#be123c", light:"#fecdd3" },
+  { id:"gold", name:"Golden Barnaby", rarity:"rare", price:450, body:"#facc15", dark:"#a16207", light:"#fef3c7" },
+  { id:"shadow", name:"Shadow Fish", rarity:"rare", price:650, body:"#374151", dark:"#111827", light:"#9ca3af" },
+  { id:"galaxy", name:"Galaxy Barnaby", rarity:"epic", price:1000, body:"#7c3aed", dark:"#1e1b4b", light:"#f0abfc" },
+  { id:"lava", name:"Lava Swimmer", rarity:"epic", price:1350, body:"#f97316", dark:"#7f1d1d", light:"#fed7aa" },
+  { id:"crystal", name:"Crystal Mythic", rarity:"mythic", price:2200, body:"#67e8f9", dark:"#0891b2", light:"#ecfeff" },
+  { id:"royal", name:"Royal Legend", rarity:"legendary", price:3500, body:"#f59e0b", dark:"#78350f", light:"#fde68a" },
+  { id:"divine", name:"Divine Barnaby", rarity:"godly", price:5000, body:"#f8fafc", dark:"#7c2d12", light:"#fef3c7" },
+  { id:"thunder", name:"Thunder Godly", rarity:"godly", price:6200, body:"#60a5fa", dark:"#1d4ed8", light:"#dbeafe" },
+  { id:"void", name:"Secret Void", rarity:"secret", price:7000, body:"#020617", dark:"#000000", light:"#f43f5e" }
+];
+
+let unlockedSkins = JSON.parse(localStorage.getItem("barnaby_unlocked_skins") || '["classic"]');
+let selectedSkinId = localStorage.getItem("barnaby_selected_skin") || "classic";
+
+function saveShop() {
+  localStorage.setItem("barnaby_total_coins", totalCoins);
+  localStorage.setItem("barnaby_unlocked_skins", JSON.stringify(unlockedSkins));
+  localStorage.setItem("barnaby_selected_skin", selectedSkinId);
+}
+
+function selectedSkin() {
+  return skins.find(s => s.id === selectedSkinId) || skins[0];
+}
+
+function setupAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+}
+
+function playTone(freq, duration, type, volume) {
+  if (!soundOn) return;
+  setupAudio();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type || "sine";
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(volume || 0.08, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+function soundFlap() { playTone(520, 0.09, "sine", 0.08); setTimeout(() => playTone(690, 0.05, "sine", 0.04), 35); }
+function soundScore() { playTone(740, 0.08, "square", 0.06); setTimeout(() => playTone(980, 0.09, "square", 0.05), 70); }
+function soundCoin(value) { playTone(value === 40 ? 900 : 650, 0.09, "triangle", 0.07); setTimeout(() => playTone(value === 40 ? 1200 : 820, 0.08, "triangle", 0.05), 60); }
+function soundCrash() { playTone(160, 0.22, "sawtooth", 0.10); setTimeout(() => playTone(90, 0.24, "sawtooth", 0.08), 110); }
+function soundButton() { playTone(440, 0.06, "triangle", 0.05); }
+function soundRespawn() { playTone(330, 0.06, "triangle", 0.04); setTimeout(() => playTone(500, 0.08, "triangle", 0.04), 70); }
+function soundBuy() { playTone(700, 0.07, "square", 0.05); setTimeout(() => playTone(900, 0.09, "square", 0.05), 80); }
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById("soundBtn").textContent = soundOn ? "Sound: ON" : "Sound: OFF";
+  if (soundOn) soundButton();
+}
+
+function makePlayer(name, x, y, body, dark, light, isBot) {
+  return {
+    name, spawnX: x, spawnY: y, x, y, size: 18,
+    vy: 0, gravity: 0.22, jump: -5.9, maxFall: 5.6, maxRise: -6.2,
+    body, dark, light, alive: true, isBot,
+    respawnTimer: 0, flapCooldown: 0, skillOffset: Math.random() * 30 - 15
+  };
+}
+
+function resetGame(newMode) {
+  mode = newMode;
+  const skin = selectedSkin();
+  player = makePlayer("Barnaby", 120, 300, skin.body, skin.dark, skin.light, false);
+  bots = [];
+  if (mode === "multiplayer") {
+    bots.push(makePlayer("Bot Blue", 90, 250, "#38bdf8", "#0369a1", "#bae6fd", true));
+    bots.push(makePlayer("Bot Green", 80, 350, "#34d399", "#047857", "#bbf7d0", true));
+    bots.push(makePlayer("Bot Orange", 70, 420, "#fb923c", "#c2410c", "#fed7aa", true));
+  }
+  walls = [];
+  coins = [];
+  floatingTexts = [];
+  score = 0;
+  gameOver = false;
+  started = false;
+  frame = 0;
+  wallSpeed = 1.9;
+  screen = "game";
+  shopPanel.style.display = "none";
+}
+
+function goMenu() {
+  soundButton();
+  screen = "menu";
+  mode = "menu";
+  started = false;
+  gameOver = false;
+  walls = [];
+  coins = [];
+  floatingTexts = [];
+  bots = [];
+}
+
+function startSingleplayer() { soundButton(); resetGame("singleplayer"); }
+function startMultiplayer() { soundButton(); resetGame("multiplayer"); }
+
+function toggleShop() {
+  soundButton();
+  renderShop();
+  shopPanel.style.display = shopPanel.style.display === "block" ? "none" : "block";
+}
+
+function renderShop() {
+  let html = `<h2>Skin Shop</h2><h3>Your coins: ${totalCoins}</h3><p>Buy skins with coins you collect while playing. Godly skins are super rare!</p>`;
+  for (let skin of skins) {
+    const owned = unlockedSkins.includes(skin.id);
+    const selected = selectedSkinId === skin.id;
+    let buttonText = owned ? (selected ? "Equipped" : "Equip") : `Buy ${skin.price}`;
+    html += `
+      <div class="skinCard">
+        <div class="skinPreview" style="background:${skin.body}; box-shadow: inset -18px 0 ${skin.dark};"></div>
+        <strong>${skin.name}</strong><br>
+        <span class="${skin.rarity}">${skin.rarity.toUpperCase()}</span><br>
+        <span>${skin.price === 0 ? "Free" : skin.price + " coins"}</span><br>
+        <button onclick="buyOrEquipSkin('${skin.id}')">${buttonText}</button>
+      </div>`;
+  }
+  shopPanel.innerHTML = html;
+}
+
+function buyOrEquipSkin(id) {
+  setupAudio();
+  const skin = skins.find(s => s.id === id);
+  if (!skin) return;
+
+  if (unlockedSkins.includes(id)) {
+    selectedSkinId = id;
+    if (player && !player.isBot) {
+      player.body = skin.body;
+      player.dark = skin.dark;
+      player.light = skin.light;
+    }
+    saveShop();
+    soundButton();
+    renderShop();
+    return;
+  }
+
+  if (totalCoins >= skin.price) {
+    totalCoins -= skin.price;
+    unlockedSkins.push(id);
+    selectedSkinId = id;
+    if (player && !player.isBot) {
+      player.body = skin.body;
+      player.dark = skin.dark;
+      player.light = skin.light;
+    }
+    saveShop();
+    soundBuy();
+    renderShop();
+  } else {
+    alert("Not enough coins! Play more and collect yellow or green coins.");
+  }
+}
+
+function flap() {
+  setupAudio();
+  if (screen === "menu") { startSingleplayer(); return; }
+  if (gameOver) { soundButton(); resetGame(mode); return; }
+  started = true;
+  if (player.alive) { player.vy = player.jump; soundFlap(); }
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.code === "Space") { e.preventDefault(); flap(); }
+});
+
+canvas.addEventListener("click", flap);
+canvas.addEventListener("touchstart", function(e) { e.preventDefault(); flap(); }, { passive: false });
+
+function spawnWall() {
+  let gapSize = 245;
+  let topHeight = Math.random() * 190 + 60;
+  let wall = { x: canvas.width + 40, w: 62, top: topHeight, bottom: topHeight + gapSize, scored: false };
+  walls.push(wall);
+
+  // Coin spawns inside the safe gap. Green coin is rarer and gives 40 coins.
+  let isGreen = Math.random() < 0.22;
+  coins.push({
+    x: wall.x + wall.w + 88,
+    y: (wall.top + wall.bottom) / 2 + (Math.random() * 90 - 45),
+    r: isGreen ? 13 : 11,
+    value: isGreen ? 40 : 10,
+    green: isGreen,
+    collected: false
+  });
+}
+
+function hitCircleRect(cx, cy, r, rx, ry, rw, rh) {
+  let nearestX = Math.max(rx, Math.min(cx, rx + rw));
+  let nearestY = Math.max(ry, Math.min(cy, ry + rh));
+  let dx = cx - nearestX;
+  let dy = cy - nearestY;
+  return dx * dx + dy * dy < r * r;
+}
+
+function hitCircleCircle(a, b) {
+  let dx = a.x - b.x;
+  let dy = a.y - b.y;
+  let rr = a.size + b.r;
+  return dx * dx + dy * dy < rr * rr;
+}
+
+function addFloatingText(text, x, y, color) {
+  floatingTexts.push({ text, x, y, color, life: 55 });
+}
+
+function drawBackground() {
+  ctx.fillStyle = "#102a4a";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < 20; i++) {
+    let x = (i * 80 + frame * 0.25) % canvas.width;
+    let y = (canvas.height - ((i * 55 + frame * 0.7) % canvas.height));
+    ctx.beginPath();
+    ctx.arc(x, y, 5 + (i % 4), 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(220,200,255,0.35)";
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#05101f";
+  ctx.fillRect(0, canvas.height - 35, canvas.width, 35);
+}
+
+function drawFish(fish) {
+  ctx.save();
+  ctx.translate(fish.x, fish.y);
+  let angle = fish.vy / 18;
+  if (angle > 0.38) angle = 0.38;
+  if (angle < -0.30) angle = -0.30;
+  ctx.rotate(angle);
+  if (!fish.alive) ctx.globalAlpha = 0.25;
+
+  ctx.fillStyle = fish.dark;
+  ctx.beginPath();
+  ctx.moveTo(-28, 0);
+  ctx.lineTo(-58, -22);
+  ctx.lineTo(-49, 0);
+  ctx.lineTo(-58, 22);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = fish.body;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 32, 23, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = fish.light;
+  ctx.beginPath();
+  ctx.ellipse(6, 8, 22, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = fish.dark;
+  ctx.beginPath();
+  ctx.moveTo(-10, -20);
+  ctx.lineTo(0, -38);
+  ctx.lineTo(12, -20);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = fish.light;
+  ctx.beginPath();
+  ctx.ellipse(-4, 21, 14, 6, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  ctx.arc(14, -8, 9, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#111827";
+  ctx.beginPath();
+  ctx.arc(17, -8, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#ff8bd1";
+  ctx.beginPath();
+  ctx.arc(17, 8, 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#06101f";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(11, 7, 9, 0.1, Math.PI - 0.25);
+  ctx.stroke();
+
+  ctx.rotate(-angle);
+  ctx.fillStyle = "white";
+  ctx.font = "bold 12px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(fish.name, 0, -45);
+
+  if (!fish.alive && fish.isBot) {
+    ctx.font = "bold 11px Arial";
+    ctx.fillText("respawning...", 0, 42);
+  }
+  ctx.restore();
+}
+
+function drawWall(wall) {
+  ctx.fillStyle = "#221338";
+  ctx.fillRect(wall.x, 0, wall.w, wall.top);
+  ctx.fillRect(wall.x, wall.bottom, wall.w, canvas.height - wall.bottom);
+  ctx.fillStyle = "#a855f7";
+  ctx.fillRect(wall.x - 8, wall.top - 22, wall.w + 16, 22);
+  ctx.fillRect(wall.x - 8, wall.bottom, wall.w + 16, 22);
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(wall.x, 0, wall.w, wall.top);
+  ctx.strokeRect(wall.x, wall.bottom, wall.w, canvas.height - wall.bottom);
+}
+
+function drawCoin(c) {
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  ctx.rotate(frame * 0.05);
+  ctx.fillStyle = c.green ? "#22c55e" : "#facc15";
+  ctx.beginPath();
+  ctx.ellipse(0, 0, c.r, c.r * 0.82, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = c.green ? "#dcfce7" : "#713f12";
+  ctx.font = "bold 12px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(c.green ? "G" : "$", 0, 1);
+  ctx.restore();
+}
+
+function drawFloatingTexts() {
+  for (let ft of floatingTexts) {
+    ctx.globalAlpha = Math.max(0, ft.life / 55);
+    ctx.fillStyle = ft.color;
+    ctx.font = "bold 22px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(ft.text, ft.x, ft.y);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function nextWallFor(fish) {
+  for (let wall of walls) if (wall.x + wall.w > fish.x - 15) return wall;
+  return null;
+}
+
+function respawnBot(bot) {
+  bot.alive = true;
+  bot.x = bot.spawnX;
+  bot.y = bot.spawnY + Math.random() * 80 - 40;
+  bot.vy = 0;
+  bot.respawnTimer = 0;
+  bot.flapCooldown = 20;
+  bot.skillOffset = Math.random() * 30 - 15;
+  soundRespawn();
+}
+
+function killFish(fish) {
+  if (!fish.alive) return;
+  fish.alive = false;
+  if (fish.isBot) fish.respawnTimer = 90;
+  else soundCrash();
+}
+
+function updateBot(bot) {
+  if (!started || gameOver) return;
+  if (!bot.alive) {
+    bot.respawnTimer--;
+    if (bot.respawnTimer <= 0) respawnBot(bot);
+    return;
+  }
+  if (bot.flapCooldown > 0) bot.flapCooldown--;
+  let targetY = 320;
+  let next = nextWallFor(bot);
+  if (next) {
+    let distanceToWall = next.x - bot.x;
+    let timeToWall = Math.max(1, distanceToWall / wallSpeed);
+    let middleOfGap = (next.top + next.bottom) / 2;
+    targetY = middleOfGap + bot.skillOffset;
+    if (timeToWall < 70) targetY -= 12;
+    if (timeToWall < 40) targetY -= 18;
+  } else targetY = 310 + bot.skillOffset;
+
+  let belowTarget = bot.y > targetY + 18;
+  let fallingTooFast = bot.vy > 2.4 && bot.y > targetY - 25;
+  let nearGround = bot.y > canvas.height - 120;
+  if ((belowTarget || fallingTooFast || nearGround) && bot.flapCooldown <= 0) {
+    bot.vy = bot.jump;
+    bot.flapCooldown = 24 + Math.floor(Math.random() * 12);
+  }
+}
+
+function updateFishPhysics(fish) {
+  if (!fish.alive) return;
+  fish.vy += fish.gravity;
+  if (fish.vy > fish.maxFall) fish.vy = fish.maxFall;
+  if (fish.vy < fish.maxRise) fish.vy = fish.maxRise;
+  fish.y += fish.vy;
+
+  for (let wall of walls) {
+    let hitTop = hitCircleRect(fish.x, fish.y, fish.size, wall.x, 0, wall.w, wall.top);
+    let hitBottom = hitCircleRect(fish.x, fish.y, fish.size, wall.x, wall.bottom, wall.w, canvas.height - wall.bottom);
+    if (hitTop || hitBottom) { killFish(fish); return; }
+  }
+
+  if (fish.y - fish.size < 0 || fish.y + fish.size > canvas.height - 35) killFish(fish);
+}
+
+function updateCoins() {
+  for (let c of coins) {
+    c.x -= wallSpeed;
+    if (!c.collected && player.alive && hitCircleCircle(player, c)) {
+      c.collected = true;
+      totalCoins += c.value;
+      saveShop();
+      addFloatingText("+" + c.value, c.x, c.y - 18, c.green ? "#86efac" : "#fde68a");
+      soundCoin(c.value);
+      if (shopPanel.style.display === "block") renderShop();
+    }
+  }
+  coins = coins.filter(c => c.x > -40 && !c.collected);
+}
+
+function updateFloatingTexts() {
+  for (let ft of floatingTexts) {
+    ft.y -= 0.7;
+    ft.life--;
+  }
+  floatingTexts = floatingTexts.filter(ft => ft.life > 0);
+}
+
+function aliveBotsCount() {
+  let count = 0;
+  for (let bot of bots) if (bot.alive) count++;
+  return count;
+}
+
+function drawMenu() {
+  drawBackground();
+  ctx.fillStyle = "rgba(0,0,0,0.65)";
+  ctx.fillRect(45, 110, 410, 430);
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+  ctx.font = "bold 34px Arial";
+  ctx.fillText("Barnaby Fish", 250, 175);
+  ctx.font = "bold 23px Arial";
+  ctx.fillText("Shop Update", 250, 215);
+  ctx.font = "20px Arial";
+  ctx.fillText("Coins: " + totalCoins, 250, 255);
+  ctx.fillText("Selected: " + selectedSkin().name, 250, 288);
+  ctx.fillStyle = "#a855f7";
+  ctx.fillRect(110, 325, 280, 60);
+  ctx.fillStyle = "white";
+  ctx.font = "bold 25px Arial";
+  ctx.fillText("Singleplayer", 250, 364);
+  ctx.fillStyle = "#22d3ee";
+  ctx.fillRect(110, 405, 280, 60);
+  ctx.fillStyle = "#06101f";
+  ctx.fillText("Multiplayer Bots", 250, 444);
+  ctx.fillStyle = "white";
+  ctx.font = "16px Arial";
+  ctx.fillText("Open the shop with the green button below", 250, 505);
+  const skin = selectedSkin();
+  drawFish(makePlayer("Barnaby", 250, 590, skin.body, skin.dark, skin.light, false));
+}
+
+function drawText() {
+  ctx.fillStyle = "white";
+  ctx.font = "bold 28px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText("Score: " + score, 20, 38);
+  ctx.font = "bold 18px Arial";
+  ctx.fillText("Coins: " + totalCoins, 20, 66);
+
+  if (mode === "multiplayer") {
+    ctx.fillText("Best Multiplayer: " + bestMulti, 20, 94);
+    ctx.fillText("Mode: Multiplayer Bots", 20, 122);
+    ctx.fillText("Bots Alive: " + aliveBotsCount(), 20, 150);
+  } else {
+    ctx.fillText("Best Singleplayer: " + bestSingle, 20, 94);
+    ctx.fillText("Mode: Singleplayer", 20, 122);
+    ctx.fillText("Skin: " + selectedSkin().name, 20, 150);
+  }
+
+  if (!started && !gameOver) {
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.fillRect(45, 215, 410, 220);
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.font = "bold 31px Arial";
+    ctx.fillText("Barnaby", 250, 265);
+    ctx.font = "20px Arial";
+    ctx.fillText("Collect coins to buy skins", 250, 305);
+    ctx.fillText("Yellow coin = 10", 250, 338);
+    ctx.fillText("Green coin = 40", 250, 371);
+    ctx.fillText("Godly skins are now in the shop!", 250, 404);
+    ctx.fillText("Press SPACE to start", 250, 406);
+  }
+
+  if (gameOver) {
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
+    ctx.fillRect(50, 205, 400, 250);
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.font = "bold 40px Arial";
+    ctx.fillText("GAME OVER", 250, 270);
+    ctx.font = "23px Arial";
+    ctx.fillText("Score: " + score, 250, 315);
+    ctx.fillText("Total Coins: " + totalCoins, 250, 350);
+    if (mode === "multiplayer") ctx.fillText("Bots alive: " + aliveBotsCount(), 250, 383);
+    ctx.fillText("Press SPACE to restart", 250, 425);
+  }
+}
+
+function updateGame() {
+  drawBackground();
+  if (started && !gameOver) {
+    if (frame % 135 === 0) spawnWall();
+    wallSpeed = 1.9 + score * 0.01;
+    for (let wall of walls) {
+      wall.x -= wallSpeed;
+      if (!wall.scored && wall.x + wall.w < player.x) {
+        wall.scored = true;
+        score++;
+        soundScore();
+        if (mode === "multiplayer") {
+          if (score > bestMulti) { bestMulti = score; localStorage.setItem("barnaby_multi_best_score", bestMulti); }
+        } else {
+          if (score > bestSingle) { bestSingle = score; localStorage.setItem("barnaby_single_best_score", bestSingle); }
+        }
+      }
+    }
+    for (let bot of bots) { updateBot(bot); updateFishPhysics(bot); }
+    updateFishPhysics(player);
+    updateCoins();
+    walls = walls.filter(wall => wall.x > -120);
+    if (!player.alive) gameOver = true;
+  }
+
+  updateFloatingTexts();
+  for (let wall of walls) drawWall(wall);
+  for (let c of coins) drawCoin(c);
+  for (let bot of bots) drawFish(bot);
+  drawFish(player);
+  drawFloatingTexts();
+  drawText();
+}
+
+function loop() {
+  frame++;
+  if (screen === "menu") drawMenu();
+  else updateGame();
+  requestAnimationFrame(loop);
+}
+
+goMenu();
+renderShop();
+loop();
+</script>
+
+  <script src="js/treasure_hunt.js" defer></script>
+</body>
+</html>
