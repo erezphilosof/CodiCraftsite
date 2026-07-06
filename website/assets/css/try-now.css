@@ -814,3 +814,26 @@ canvas#confetti-canvas {
     font-family: var(--font-rubik);
     font-weight: 700;
 }
+
+/* Mobile Responsive Styling Overrides */
+@media (max-width: 640px) {
+    .toolbox-items {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        justify-content: center !important;
+    }
+    .toolbox-items .code-block {
+        flex: 1 1 calc(50% - 8px) !important;
+        justify-content: center !important;
+        padding: 8px 10px !important;
+        font-size: 0.8rem !important;
+    }
+    .modal-card {
+        padding: 20px 15px !important;
+        border-radius: 16px !important;
+        max-height: 95vh !important;
+        width: 92% !important;
+    }
+}
+

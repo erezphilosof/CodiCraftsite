@@ -507,7 +507,7 @@
     }
     .mag-sidebar {
         order: -1;
-        height: 220px;
+        height: auto;
     }
     .tm-actions {
         flex-direction: column;

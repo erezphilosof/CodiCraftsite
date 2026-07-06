@@ -984,6 +984,11 @@ footer .legal {
     }
 
     /* Shape Slider and Hero Controls on Mobile */
+    #controls {
+        top: auto !important;
+        bottom: 125px !important;
+        transform: translateX(-50%) !important;
+    }
     #shape-slider {
         padding: 0.5rem 1rem;
         gap: 0.5rem;
