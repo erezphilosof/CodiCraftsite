@@ -189,7 +189,55 @@ class CardStreamController {
     generateCodeCache() { this.codeCache = []; const w = window.innerWidth < 768 ? 280 : 400; const h = window.innerWidth < 768 ? 175 : 250; const { width, height } = this.calculateCodeDimensions(w, h); for (let i = 0; i < 12; i++) { this.codeCache.push(this.generateCode(width, height)) } }
     setupIntersectionObserver() { this.isPaused = !1; const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { if (this.isPaused) { this.isPaused = !1; this.lastTime = performance.now(); this.animate() } } else { this.isPaused = !0 } }) }, { threshold: 0 }); if (this.container) observer.observe(this.container); }
     calculateDimensions() { this.containerWidth = this.container.offsetWidth; this.containerLeft = this.container.getBoundingClientRect().left; const cardWidth = window.innerWidth < 768 ? 280 : 400; const cardGap = window.innerWidth < 768 ? 30 : 60; const cardCount = this.cardWrappers ? this.cardWrappers.length : this.cardLine.children.length; this.cardLineWidth = (cardWidth + cardGap) * cardCount; this.cardTotalWidth = cardWidth + cardGap }
-    setupEventListeners() { this.cardLine.addEventListener("mousedown", (e) => this.startDrag(e)); document.addEventListener("mousemove", (e) => this.onDrag(e)); document.addEventListener("mouseup", () => this.endDrag()); this.cardLine.addEventListener("touchstart", (e) => { if (e.cancelable) e.preventDefault(); this.startDrag(e.touches[0]) }, { passive: !1 }); document.addEventListener("touchmove", (e) => this.onDrag(e.touches[0]), { passive: !1, }); document.addEventListener("touchend", () => this.endDrag()); this.cardLine.addEventListener("selectstart", (e) => e.preventDefault()); this.cardLine.addEventListener("dragstart", (e) => e.preventDefault()); window.addEventListener("resize", () => this.calculateDimensions()) }
+    setupEventListeners() {
+        this.cardLine.addEventListener("mousedown", (e) => this.startDrag(e));
+        document.addEventListener("mousemove", (e) => this.onDrag(e));
+        document.addEventListener("mouseup", () => this.endDrag());
+        
+        this.cardLine.addEventListener("touchstart", (e) => {
+            this.isTouchDragging = true;
+            this.touchStartX = e.touches[0].clientX;
+            this.touchStartY = e.touches[0].clientY;
+            this.touchDirectionDetected = false;
+            this.isVerticalScroll = false;
+            this.startDrag(e.touches[0]);
+        }, { passive: true });
+
+        this.cardLine.addEventListener("touchmove", (e) => {
+            if (!this.isTouchDragging) return;
+            const touch = e.touches[0];
+            
+            if (!this.touchDirectionDetected) {
+                const dx = Math.abs(touch.clientX - this.touchStartX);
+                const dy = Math.abs(touch.clientY - this.touchStartY);
+                if (dx > 5 || dy > 5) {
+                    this.touchDirectionDetected = true;
+                    if (dy > dx) {
+                        this.isVerticalScroll = true;
+                        this.isDragging = false; // Cancel dragging card stream to allow page scroll
+                    }
+                }
+            }
+
+            if (this.isVerticalScroll) {
+                return; // Let the browser handle native page scrolling!
+            }
+
+            if (e.cancelable) {
+                e.preventDefault(); // Lock page scrolling for horizontal drag
+            }
+            this.onDrag(touch);
+        }, { passive: false });
+
+        this.cardLine.addEventListener("touchend", () => {
+            this.isTouchDragging = false;
+            this.endDrag();
+        });
+
+        this.cardLine.addEventListener("selectstart", (e) => e.preventDefault());
+        this.cardLine.addEventListener("dragstart", (e) => e.preventDefault());
+        window.addEventListener("resize", () => this.calculateDimensions());
+    }
     startDrag(e) { if (e.preventDefault) e.preventDefault(); this.isDragging = !0; this.isAnimating = !1; this.lastMouseX = e.clientX; this.mouseVelocity = 0; this.cardLine.style.animation = "none"; this.cardLine.classList.add("dragging"); document.body.style.userSelect = "none"; document.body.style.cursor = "grabbing" }
     onDrag(e) { if (!this.isDragging) return; e.preventDefault(); const deltaX = e.clientX - this.lastMouseX; this.position += deltaX; this.mouseVelocity = deltaX * 60; this.lastMouseX = e.clientX; this.cardLine.style.transform = `translateX(${this.position}px)`; this.updateCardClipping() }
     endDrag() {
@@ -357,7 +405,7 @@ class Node {
         const accessBtn = document.createElement('div'); accessBtn.className = 'node-access'; accessBtn.innerText = '+'; accessBtn.addEventListener('click', (e) => { e.stopPropagation(); openModal(this) }); accessBtn.addEventListener('touchstart', (e) => { e.stopPropagation() }); const resetBtn = document.createElement('div'); resetBtn.className = 'node-reset-btn'; resetBtn.innerText = (window.SERVICES_DATA && window.SERVICES_DATA.ui.reset) || 'RESET'; resetBtn.addEventListener('click', (e) => { e.stopPropagation(); triggerReset(this) }); resetBtn.addEventListener('touchstart', (e) => { e.stopPropagation() }); content.innerHTML = nodeIcon + titleHtml; content.appendChild(accessBtn); content.appendChild(resetBtn); front.appendChild(shine); front.appendChild(glare); front.appendChild(content); rotator.appendChild(front); rotator.appendChild(front); translater.appendChild(rotator); el.appendChild(translater); gameArea.appendChild(el); this.dom = { el: el, rotator: rotator, glare: glare, shine: shine, resetBtn: resetBtn }; return el
     }
     enableReset() { if (this.dom && this.dom.resetBtn) { this.dom.resetBtn.classList.add('visible') } }
-    initHammer() { const mc = new Hammer(this.element); mc.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 0 }); mc.on('panstart', (e) => { this.dragging = !0; this.startX = this.x; this.startY = this.y; anime({ targets: this.element, scale: 1.05, duration: 150, easing: 'easeOutQuad' }) }); mc.on('pan', (e) => { if (this.dragging) { this.x = this.startX + e.deltaX; this.y = this.startY + e.deltaY; this.updatePosition(); updateConnections() } }); mc.on('panend', (e) => { if (this.dragging) { this.dragging = !1; anime({ targets: this.element, scale: 1, duration: 150, easing: 'easeOutQuad' }); checkCollision(this) } }); mc.on('tap', (e) => { if (!this.dragging) openModal(this); }) }
+    initHammer() { const mc = new Hammer(this.element); mc.get('pan').set({ direction: Hammer.DIRECTION_ALL, threshold: 12 }); mc.on('panstart', (e) => { this.dragging = !0; this.startX = this.x; this.startY = this.y; anime({ targets: this.element, scale: 1.05, duration: 150, easing: 'easeOutQuad' }) }); mc.on('pan', (e) => { if (this.dragging) { this.x = this.startX + e.deltaX; this.y = this.startY + e.deltaY; this.updatePosition(); updateConnections() } }); mc.on('panend', (e) => { if (this.dragging) { this.dragging = !1; anime({ targets: this.element, scale: 1, duration: 150, easing: 'easeOutQuad' }); checkCollision(this) } }); mc.on('tap', (e) => { if (!this.dragging) openModal(this); }) }
     updatePosition() { this.element.style.transform = `translate3d(${this.x}px, ${this.y}px, 0)` }
     getCenter() { return { x: this.x + (this.width / 2), y: this.y + (this.height / 2) } }
     getRadius() { return this.width / 2 }
