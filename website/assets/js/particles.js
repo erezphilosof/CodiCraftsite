@@ -3,7 +3,26 @@ import { SHAPES } from './shapes.js?v=1.0.1'; let activeShapes = SHAPES; import 
     let progress = 0; const progressBar = document.getElementById('progress'); const loadingScreen = document.getElementById('loading'); function updateProgress(increment) { progress += increment; progressBar.style.width = `${Math.min(100, progress)}%`; if (progress >= 100) { setTimeout(() => { loadingScreen.style.opacity = '0'; setTimeout(() => { loadingScreen.style.display = 'none' }, 500) }, 200) } }
     clock = new THREE.Clock(); noise3D = createNoise3D(() => Math.random()); noise4D = createNoise4D(() => Math.random()); scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x000308, 0.09); activeColorScheme = { ...COLOR_SCHEMES[CONFIG.colorScheme] }; updateUIColors(); updateProgress(5); camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000); camera.position.set(0, 8, 5); camera.lookAt(scene.position); updateProgress(5); const canvas = document.getElementById('webglCanvas'); renderer = new THREE.WebGLRenderer({ canvas, antialias: !0, alpha: !0, powerPreference: 'high-performance' }); renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(window.innerWidth < 768 ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2)); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1; updateProgress(10); controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = !0; controls.dampingFactor = 0.05; controls.minDistance = 5; controls.maxDistance = 80; controls.autoRotate = !0; controls.autoRotateSpeed = 0.3; updateProgress(5); scene.add(new THREE.AmbientLight(0x004060)); const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.5); dirLight1.position.set(15, 20, 10); scene.add(dirLight1); const dirLight2 = new THREE.DirectionalLight(0x88aaff, 0.9); dirLight2.position.set(-15, -10, -15); updateProgress(10); setupPostProcessing(); updateProgress(10); createStarfield(); updateProgress(15); setupParticleSystem(); updateProgress(25); window.addEventListener('resize', onWindowResize); window.addEventListener('click', onCanvasClick); updateProgress(15); setupInteraction(); isInitialized = !0; controls.enabled = !1; const initialAspect = window.innerWidth / window.innerHeight; const targetZ = initialAspect >= 1.25 ? 28 : Math.min(45, 28 * (1.25 / Math.max(0.65, initialAspect))); anime({ targets: camera.position, z: targetZ, y: 8, duration: 3500, easing: 'easeOutCubic', update: () => camera.lookAt(scene.position), complete: () => { controls.enabled = !0 } }); animate(); return { scene, camera, renderer, controls }
 }
-function setupInteraction() { window.addEventListener('mousemove', (event) => { mouse.x = (event.clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; isInteractionActive = !0; isSettled = !1; clearTimeout(interactionTimer); interactionTimer = setTimeout(() => { isInteractionActive = !1 }, 2000) }); const hammer = new Hammer(document.body); hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL }); hammer.on('pan', (ev) => { mouse.x = (ev.center.x / window.innerWidth) * 2 - 1; mouse.y = -(ev.center.y / window.innerHeight) * 2 + 1; isInteractionActive = !0; isSettled = !1; clearTimeout(interactionTimer); interactionTimer = setTimeout(() => { isInteractionActive = !1 }, 2000) }); hammer.on('panend', () => { }) }
+function setupInteraction() {
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        isInteractionActive = true;
+        isSettled = false;
+        clearTimeout(interactionTimer);
+        interactionTimer = setTimeout(() => { isInteractionActive = false }, 2000);
+    });
+    window.addEventListener('touchmove', (event) => {
+        if (event.touches.length > 0) {
+            mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.touches[0].clientY / window.innerHeight) * 2 + 1;
+            isInteractionActive = true;
+            isSettled = false;
+            clearTimeout(interactionTimer);
+            interactionTimer = setTimeout(() => { isInteractionActive = false }, 2000);
+        }
+    }, { passive: true });
+}
 function setupPostProcessing() { composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera)); const isMobile = window.innerWidth < 768; const bloomRes = isMobile ? new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2) : new THREE.Vector2(window.innerWidth, window.innerHeight); bloomPass = new UnrealBloomPass(bloomRes, CONFIG.bloomStrength, CONFIG.bloomRadius, CONFIG.bloomThreshold); composer.addPass(bloomPass) }
 function createCodeCharTexture(char) {
     const size = 128;
