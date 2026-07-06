@@ -1319,12 +1319,12 @@ body.modal-open {
     }
     
     .station-block.active .cardboard-card {
-        transform: perspective(600px) rotateX(0deg) translateY(0px) scale(1) rotate(-1deg);
+        transform: perspective(600px) rotateX(0deg) translateY(0px) scale(1) rotate(0deg);
         opacity: 1;
     }
     
     .station-block.active.reverse .cardboard-card {
-        transform: perspective(600px) rotateX(0deg) translateY(0px) scale(1) rotate(1deg);
+        transform: perspective(600px) rotateX(0deg) translateY(0px) scale(1) rotate(0deg);
     }
     
     .station-sticker {
