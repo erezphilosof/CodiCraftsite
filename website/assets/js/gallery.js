@@ -7,11 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Navigation and menu toggle for all pages
     const menuBtn = document.querySelector(".menu.toggle");
-    const navMenu = document.querySelector("nav[aria-label='First menu']");
-    if (menuBtn && navMenu) {
-        menuBtn.addEventListener("click", () => {
+    if (menuBtn && !menuBtn.dataset.menuListenerAttached) {
+        menuBtn.dataset.menuListenerAttached = "true";
+        menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
             menuBtn.classList.toggle("active");
-            navMenu.classList.toggle("active");
         });
     }
 

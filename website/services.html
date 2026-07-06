@@ -751,15 +751,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         initServices();
         
-        // Hamburger Menu Toggle
-        const menuToggle = document.querySelector("#ui .menu");
-        if (menuToggle) {
-            menuToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                menuToggle.classList.toggle('active');
-            });
-        }
-        
         // Remove loading screen
         const loader = document.getElementById('loading');
         if (loader) {

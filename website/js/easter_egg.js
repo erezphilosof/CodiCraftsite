@@ -145,18 +145,12 @@
     // Global Mobile Navbar Toggle Handler
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.querySelector("#ui .menu");
-        if (menuToggle) {
-            const isMainPage = document.getElementById('webglCanvas') !== null;
-            const hasInlineScript = window.location.pathname.endsWith('services.html') || 
-                                    window.location.pathname.endsWith('faq.html') || 
-                                    window.location.pathname.endsWith('contact.html');
-            if (!isMainPage && !hasInlineScript && !menuToggle.dataset.menuListenerAttached) {
-                menuToggle.dataset.menuListenerAttached = "true";
-                menuToggle.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    menuToggle.classList.toggle('active');
-                });
-            }
+        if (menuToggle && !menuToggle.dataset.menuListenerAttached) {
+            menuToggle.dataset.menuListenerAttached = "true";
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                menuToggle.classList.toggle('active');
+            });
         }
         
         // Also close the menu when a link inside the nav is clicked

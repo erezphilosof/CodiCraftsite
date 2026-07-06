@@ -4,7 +4,7 @@ import anime from 'animejs'; import { switchToScrollMode, switchTo3DMode } from 
     initListeners() {
         if (this.prevBtn) { this.prevBtn.addEventListener('click', (e) => { e.stopPropagation(); this.onPrevShape() }) }
         if (this.nextBtn) { this.nextBtn.addEventListener('click', (e) => { e.stopPropagation(); this.onNextShape() }) }
-        if (this.menuToggle) { this.menuToggle.addEventListener('click', (e) => { e.stopPropagation(); this.menuToggle.classList.toggle('active'); console.log('Menu Toggled') }) }
+        if (this.menuToggle && !this.menuToggle.dataset.menuListenerAttached) { this.menuToggle.dataset.menuListenerAttached = "true"; this.menuToggle.addEventListener('click', (e) => { e.stopPropagation(); this.menuToggle.classList.toggle('active'); console.log('Menu Toggled') }) }
         const shapeSlider = document.getElementById('shape-slider'); if (shapeSlider) { shapeSlider.addEventListener('click', (e) => { e.stopPropagation() }) }
     }
     updateText(title, description) {
