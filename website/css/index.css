@@ -1307,6 +1307,7 @@ footer .legal {
     #chat-agent-container {
         bottom: 20px;
         right: 20px;
+        z-index: 200000 !important;
     }
     #chat-agent-window {
         position: fixed;
