@@ -443,6 +443,66 @@ nav a:hover .icon {
     font-weight: 300
 }
 
+/* ── Typewriter Hero ───────────────────────────────────────────── */
+#typewriter-hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-top: 14px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.25rem;
+    flex-wrap: wrap;
+    text-align: center;
+    line-height: 1.4;
+}
+
+#typewriter-prefix {
+    color: rgba(255,255,255,0.75);
+    white-space: nowrap;
+}
+
+#typewriter-word {
+    background: linear-gradient(90deg, #00ffea, #00a2ff, #a855f7, #f472b6);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: typewriterGradient 3s linear infinite;
+    font-size: 1.35rem;
+    letter-spacing: 0.5px;
+    min-width: 2px;
+}
+
+@keyframes typewriterGradient {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+.typewriter-cursor {
+    color: #00ffea;
+    font-size: 1.3rem;
+    font-weight: 300;
+    animation: cursorBlink 0.75s step-end infinite;
+    margin-right: 2px;
+    line-height: 1;
+    -webkit-text-fill-color: #00ffea;
+}
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+
+@media (max-width: 600px) {
+    #typewriter-hero {
+        font-size: 1.05rem;
+    }
+    #typewriter-word {
+        font-size: 1.15rem;
+    }
+}
+
 .container {
     position: relative;
     min-height: 180px;

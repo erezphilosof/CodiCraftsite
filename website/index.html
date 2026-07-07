@@ -142,6 +142,11 @@
         <h2 id="shape-title" style="display: none; margin: 0; font-size: 1.4rem; font-weight: 400; letter-spacing: 2px; text-transform: uppercase;"></h2>
         
         <p id="shape-desc">המוח שמאחורי הקוד. אנו מובילים חדשנות דיגיטלית מתקדמת ומספקים פתרונות תוכנה חכמים לעסקים.</p>
+        
+        <!-- Typewriter Hero Text -->
+        <div id="typewriter-hero" aria-live="polite">
+          <span id="typewriter-prefix">אנחנו מלמדים&nbsp;</span><span id="typewriter-word"></span><span class="typewriter-cursor">|</span>
+        </div>
       </div>
       <button class="arrow-btn" id="next-btn" aria-label="Next Shape">❯</button>
     </div>
@@ -493,4 +498,66 @@
   <script src="js/weather_station.js" defer></script>
   <script src="js/time_machine.js" defer></script>
   <script src="js/dubbing_studio.js" defer></script>
+
+  <!-- Typewriter Hero Script -->
+  <script>
+    (function() {
+      const words = [
+        'תכנות 💻',
+        'רובוטיקה 🤖',
+        'בינה מלאכותית 🧠',
+        'פיתוח משחקים 🎮',
+        'חשיבה לוגית 🔍',
+        'יצירתיות דיגיטלית ✨',
+        'Minecraft Coding ⛏️'
+      ];
+
+      const wordEl    = document.getElementById('typewriter-word');
+      const cursorEl  = document.querySelector('.typewriter-cursor');
+      if (!wordEl) return;
+
+      let wIdx = 0, cIdx = 0, deleting = false;
+
+      const TYPE_SPEED   = 80;   // ms per char while typing
+      const DELETE_SPEED = 40;   // ms per char while erasing
+      const PAUSE_AFTER  = 1800; // pause (ms) when word is fully typed
+      const PAUSE_BEFORE = 300;  // pause (ms) before typing next word
+
+      function tick() {
+        const current = words[wIdx];
+
+        if (!deleting) {
+          // Typing
+          cIdx++;
+          wordEl.textContent = current.slice(0, cIdx);
+
+          if (cIdx === current.length) {
+            // Word complete — pause then start deleting
+            deleting = true;
+            setTimeout(tick, PAUSE_AFTER);
+            return;
+          }
+          setTimeout(tick, TYPE_SPEED);
+
+        } else {
+          // Erasing
+          cIdx--;
+          wordEl.textContent = current.slice(0, cIdx);
+
+          if (cIdx === 0) {
+            // Done erasing — move to next word
+            deleting = false;
+            wIdx = (wIdx + 1) % words.length;
+            setTimeout(tick, PAUSE_BEFORE);
+            return;
+          }
+          setTimeout(tick, DELETE_SPEED);
+        }
+      }
+
+      // Kick off after a short delay so page loads first
+      setTimeout(tick, 1200);
+    })();
+  </script>
+
 </body></html>
