@@ -67,6 +67,17 @@ class CardGenerator {
         this.valHardware = document.getElementById('val-hardware');
         
         this.btnDownload = document.getElementById('btn-download-card');
+
+        // New camera & file upload elements
+        this.btnUploadAvatar = document.getElementById('btn-upload-avatar');
+        this.btnCameraAvatar = document.getElementById('btn-camera-avatar');
+        this.fileInput = document.getElementById('cg-file-input');
+        
+        this.cameraModal = document.getElementById('camera-modal');
+        this.closeCameraBtn = document.getElementById('close-camera-modal');
+        this.videoStream = document.getElementById('camera-stream');
+        this.btnCapturePhoto = document.getElementById('btn-capture-photo');
+        this.stream = null;
     }
 
     bindEvents() {
@@ -92,6 +103,102 @@ class CardGenerator {
         if (this.btnDownload) {
             this.btnDownload.addEventListener('click', () => this.downloadCard());
         }
+
+        // File upload trigger
+        if (this.btnUploadAvatar && this.fileInput) {
+            this.btnUploadAvatar.addEventListener('click', () => this.fileInput.click());
+            this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+        }
+
+        // Camera trigger & modal actions
+        if (this.btnCameraAvatar) {
+            this.btnCameraAvatar.addEventListener('click', () => this.openCamera());
+        }
+        if (this.closeCameraBtn) {
+            this.closeCameraBtn.addEventListener('click', () => this.closeCamera());
+        }
+        if (this.btnCapturePhoto) {
+            this.btnCapturePhoto.addEventListener('click', () => this.captureSelfie());
+        }
+    }
+
+    async openCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('מצלמה אינה נתמכת בדפדפן או במכשיר זה. אנא העלו תמונה מהגלריה.');
+            return;
+        }
+
+        try {
+            this.stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: 480, height: 480 }
+            });
+            if (this.videoStream) {
+                this.videoStream.srcObject = this.stream;
+            }
+            if (this.cameraModal) {
+                this.cameraModal.style.display = 'flex';
+            }
+        } catch (err) {
+            console.error('Error opening camera:', err);
+            alert('לא הצלחנו לגשת למצלמה. ודאו שאישרתם הרשאות מצלמה או בחרו באפשרות העלאת תמונה.');
+        }
+    }
+
+    closeCamera() {
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => track.stop());
+            this.stream = null;
+        }
+        if (this.videoStream) {
+            this.videoStream.srcObject = null;
+        }
+        if (this.cameraModal) {
+            this.cameraModal.style.display = 'none';
+        }
+    }
+
+    captureSelfie() {
+        if (!this.videoStream || !this.stream) return;
+
+        try {
+            const canvas = document.createElement('canvas');
+            canvas.width = 480;
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+            
+            // Mirror selfie naturally
+            ctx.translate(480, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(this.videoStream, 0, 0, 480, 480);
+            
+            const dataUrl = canvas.toDataURL('image/png');
+            this.selectedAvatar = dataUrl;
+            this.updatePreview();
+            this.closeCamera();
+        } catch (err) {
+            console.error('Error capturing photo:', err);
+            alert('שגיאה בלכידת התמונה. אנא נסו שוב.');
+        }
+    }
+
+    handleFileUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('אנא בחרו קובץ תמונה תקין.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            this.selectedAvatar = event.target.result;
+            this.updatePreview();
+        };
+        reader.onerror = () => {
+            alert('שגיאה בקריאת הקובץ. נסו שוב.');
+        };
+        reader.readAsDataURL(file);
     }
 
     translateHebrew(text) {

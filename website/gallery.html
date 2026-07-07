@@ -112,6 +112,15 @@
                             <button id="btn-generate-ai" class="btn-generate-ai">צרו רובוט! 🧠✨</button>
                         </div>
                     </div>
+                    
+                    <div class="cg-group" style="margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+                        <label>או העלו תמונה / צלמו סלפי משלכם:</label>
+                        <div style="display: flex; gap: 12px; width: 100%;">
+                            <button id="btn-upload-avatar" class="cg-btn-secondary" style="flex: 1; background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%); color: white; display: flex; align-items: center; justify-content: center; gap: 8px;">📁 העלאת תמונה</button>
+                            <button id="btn-camera-avatar" class="cg-btn-secondary" style="flex: 1; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%); color: white; display: flex; align-items: center; justify-content: center; gap: 8px;">📸 צילום במצלמה</button>
+                        </div>
+                        <input type="file" id="cg-file-input" accept="image/*" style="display: none;">
+                    </div>
                 </div>
 
                 <!-- Preview Panel -->
@@ -269,6 +278,18 @@
   <a href="contact.html" class="mobile-sticky-cta" aria-label="Book Trial">שריון שיעור ניסיון 🚀</a>
 <script src="js/easter_egg.js" defer></script>
   <script src="js/treasure_hunt.js" defer></script>
-  <script src="js/card_generator.js" defer></script>
+    <!-- Camera Modal -->
+    <div id="camera-modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; direction: rtl;">
+        <div class="camera-modal-content" style="background: #1e293b; padding: 25px; border-radius: 20px; width: 90%; max-width: 500px; text-align: center; border: 2px solid #00ffea; box-shadow: 0 0 25px rgba(0,255,234,0.3); position: relative;">
+            <button id="close-camera-modal" style="position: absolute; top: 15px; left: 15px; background: none; border: none; color: #94a3b8; font-size: 28px; cursor: pointer; transition: color 0.2s;">&times;</button>
+            <h3 style="color: white; margin-top: 0; margin-bottom: 20px; font-family: 'Secular One', sans-serif;">📸 צלמו סלפי לכרטיס השחקן!</h3>
+            <div class="video-container" style="position: relative; width: 100%; padding-bottom: 75%; background: #0f172a; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                <video id="camera-stream" autoplay playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);"></video>
+            </div>
+            <button id="btn-capture-photo" class="btn-download-card" style="width: 100%; padding: 14px 20px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">📷 לכידת תמונה!</button>
+        </div>
+    </div>
+
+    <script src="js/card_generator.js" defer></script>
 </body>
 </html>

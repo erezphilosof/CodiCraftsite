@@ -450,3 +450,32 @@
         padding: 14px 18px;
     }
 }
+
+/* Parent/Child Camera & Upload Button Styles */
+.cg-btn-secondary {
+    border: none;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-family: 'Secular One', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-weight: bold;
+    outline: none;
+}
+
+.cg-btn-secondary:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
+}
+
+.camera-modal-content {
+    animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
