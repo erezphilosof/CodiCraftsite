@@ -713,7 +713,7 @@ canvas#confetti-canvas {
 @media (max-width: 480px) {
     .form-row {
         grid-template-columns: 1fr;
-        gap: 0;
+        gap: 15px;
     }
 }
 

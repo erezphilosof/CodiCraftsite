@@ -2,6 +2,54 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const nodemailer = require('nodemailer');
+const https = require('https');
+
+async function safeFetch(url, options = {}) {
+    if (typeof global.fetch === 'function') {
+        try {
+            return await global.fetch(url, options);
+        } catch (e) {
+            console.warn('global.fetch failed, falling back to https:', e);
+        }
+    }
+    
+    return new Promise((resolve, reject) => {
+        const urlObj = new URL(url);
+        const headers = options.headers || {};
+        const method = options.method || 'GET';
+        
+        const reqOptions = {
+            hostname: urlObj.hostname,
+            path: urlObj.pathname + urlObj.search,
+            method: method,
+            headers: headers
+        };
+        
+        const req = https.request(reqOptions, (res) => {
+            let data = '';
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+            res.on('end', () => {
+                resolve({
+                    ok: res.statusCode >= 200 && res.statusCode < 300,
+                    status: res.statusCode,
+                    text: async () => data,
+                    json: async () => JSON.parse(data)
+                });
+            });
+        });
+        
+        req.on('error', (err) => {
+            reject(err);
+        });
+        
+        if (options.body) {
+            req.write(typeof options.body === 'string' ? options.body : JSON.stringify(options.body));
+        }
+        req.end();
+    });
+}
 
 const app = express();
 
@@ -139,7 +187,7 @@ app.post('/api/chat', async (req, res) => {
         
         const finalKey = nvidiaApiKey || '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';
 
-        const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+        const response = await safeFetch('https://integrate.api.nvidia.com/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -308,7 +356,7 @@ Do not include any intro, markdown formatting, or code blocks outside the raw JS
         
         const finalKey = nvidiaApiKey || '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';
 
-        const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+        const response = await safeFetch('https://integrate.api.nvidia.com/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -384,7 +432,7 @@ app.post('/api/schedule', async (req, res) => {
     
     try {
         console.log('Sending lead to Base 44:', payload);
-        const response = await fetch('https://codicraft.base44.app/api/apps/6985ef94cc45c18bc62542c3/entities/Lead', {
+        const response = await safeFetch('https://codicraft.base44.app/api/apps/6985ef94cc45c18bc62542c3/entities/Lead', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
