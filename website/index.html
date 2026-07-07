@@ -5,7 +5,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Fredoka+One&family=Space+Grotesk:wght@300;400;500;600;700&family=Rubik:wght@400;500;700;900&family=Secular+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/index.css">
-  <link rel="stylesheet" href="css/codi_mascot.css">
   <link rel="icon" type="image/png" href="favicon.png">
   <title>CodiCraft - פתרונות תוכנה חכמים וכלי ניהול מתקדמים.</title>
   <meta name="description" content="CodiCraft מספקת פתרונות תוכנה חכמים וכלי ניהול מתקדמים, המעצימים את הדור הבא של יוצרים דיגיטליים.">
@@ -214,12 +213,13 @@
           </form>
           
           <!-- Portal Warp Loading -->
-          <div id="tm-portal-loading" class="tm-loading">
-            <div class="tm-loading-portal">
+          <div id="tm-portal-loading" class="tm-loading" style="position: relative; overflow: hidden; min-height: 320px; border-radius: 16px; background: #020617; display: none;">
+            <canvas id="tm-warp-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1; border-radius: 16px;"></canvas>
+            <div class="tm-loading-portal" style="z-index: 2; margin-top: 20px;">
               <div class="tm-loading-inner"></div>
             </div>
-            <div class="tm-loading-title">משגר את מכונת הזמן...</div>
-            <div class="tm-loading-status" id="tm-loading-step">מתחבר לשנת 2045...</div>
+            <div class="tm-loading-title" style="z-index: 2; text-shadow: 0 0 10px rgba(0,255,234,0.4); margin-top: 15px;">משגר את מכונת הזמן...</div>
+            <div class="tm-loading-status" id="tm-loading-step" style="z-index: 2; font-weight: bold; color: #fff; margin-top: 8px;">מתחבר לשנת 2045...</div>
           </div>
           
           <!-- Futuristic Magazine Cover Result -->
@@ -560,7 +560,5 @@
       setTimeout(tick, 1200);
     })();
   </script>
-
-  <script src="js/codi_mascot.js" defer></script>
 
 </body></html>

@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tmResetBtn = document.getElementById('tm-reset-btn');
 
     let currentStory = null;
+    let stopWarp = null;
 
     if (tmForm) {
         tmForm.addEventListener('submit', async (e) => {
@@ -42,6 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Hide form, show portal loading
             tmForm.style.display = 'none';
             tmPortalLoading.style.display = 'flex';
+
+            // Start 3D Warp Tunnel animation!
+            if (stopWarp) stopWarp();
+            stopWarp = startWarpTunnel();
 
             // 3. Loading animation steps simulation
             const steps = [
@@ -73,11 +78,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 currentStory = data;
 
-                // Wait at least 3 seconds total for maximum dramatic effect
+                // Wait at least 3.5 seconds total for maximum dramatic effect
                 setTimeout(() => {
                     clearInterval(stepInterval);
+                    if (stopWarp) {
+                        stopWarp();
+                        stopWarp = null;
+                    }
                     showResult(data, childName, gender);
-                }, 3000);
+                }, 3500);
 
             } catch (err) {
                 console.error("Time Machine warp error, using client-side generator:", err);
@@ -87,8 +96,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 setTimeout(() => {
                     clearInterval(stepInterval);
+                    if (stopWarp) {
+                        stopWarp();
+                        stopWarp = null;
+                    }
                     showResult(fallback, childName, gender);
-                }, 3000);
+                }, 3500);
             }
         });
     }
@@ -98,6 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
             tmFutureResult.style.display = 'none';
             tmPortalLoading.style.display = 'none';
             tmForm.style.display = 'grid';
+            if (stopWarp) {
+                stopWarp();
+                stopWarp = null;
+            }
             
             // Focus back to name input
             childNameInput.focus();
@@ -255,3 +272,95 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 });
+
+// 3D Canvas Warp Tunnel Animation Engine
+function startWarpTunnel() {
+    const canvas = document.getElementById('tm-warp-canvas');
+    if (!canvas) return null;
+
+    const ctx = canvas.getContext('2d');
+    let width = canvas.offsetWidth;
+    let height = canvas.offsetHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    const resize = () => {
+        if (!canvas) return;
+        width = canvas.offsetWidth;
+        height = canvas.offsetHeight;
+        canvas.width = width;
+        canvas.height = height;
+    };
+    window.addEventListener('resize', resize);
+
+    const numStars = 180;
+    const stars = [];
+    for (let i = 0; i < numStars; i++) {
+        stars.push({
+            x: (Math.random() - 0.5) * 1000,
+            y: (Math.random() - 0.5) * 1000,
+            z: Math.random() * 1000,
+            color: getRandomColor()
+        });
+    }
+
+    function getRandomColor() {
+        const colors = ['#00ffea', '#0284c7', '#6366f1', '#f472b6', '#3b82f6'];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    let speed = 18;
+    let animId = null;
+
+    function draw() {
+        ctx.fillStyle = 'rgba(2, 6, 23, 0.18)';
+        ctx.fillRect(0, 0, width, height);
+
+        const cx = width / 2;
+        const cy = height / 2;
+
+        for (let i = 0; i < numStars; i++) {
+            const star = stars[i];
+            star.z -= speed;
+
+            if (star.z <= 0) {
+                star.x = (Math.random() - 0.5) * 1000;
+                star.y = (Math.random() - 0.5) * 1000;
+                star.z = 1000;
+            }
+
+            const k = 400 / star.z;
+            const px = star.x * k + cx;
+            const py = star.y * k + cy;
+
+            if (px >= 0 && px < width && py >= 0 && py < height) {
+                const size = (1 - star.z / 1000) * 4;
+                const prevK = 400 / (star.z + speed * 1.5);
+                const ppx = star.x * prevK + cx;
+                const ppy = star.y * prevK + cy;
+
+                ctx.beginPath();
+                ctx.strokeStyle = star.color;
+                ctx.lineWidth = size;
+                ctx.moveTo(px, py);
+                ctx.lineTo(ppx, ppy);
+                ctx.stroke();
+            }
+        }
+
+        if (speed < 40) {
+            speed += 0.15;
+        }
+
+        animId = requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    return () => {
+        if (animId) {
+            cancelAnimationFrame(animId);
+        }
+        window.removeEventListener('resize', resize);
+    };
+}
