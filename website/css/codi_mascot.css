@@ -1,0 +1,429 @@
+/* ══════════════════════════════════════════════════════════════
+   🤖 Codi 3D Robot Mascot — CSS
+   ══════════════════════════════════════════════════════════════ */
+
+#codi-mascot-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9000;
+    pointer-events: auto;
+    cursor: pointer;
+    perspective: 600px;
+    width: 100px;
+    height: 140px;
+    transition: transform 0.3s ease;
+}
+
+#codi-mascot-container:hover {
+    transform: scale(1.08);
+}
+
+/* ── The whole robot body wrapper ─────────────── */
+.codi-robot {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    animation: codiBreathe 3s ease-in-out infinite;
+}
+
+@keyframes codiBreathe {
+    0%, 100% { transform: translateY(0px) rotateX(0deg); }
+    50%      { transform: translateY(-6px) rotateX(1deg); }
+}
+
+/* ── Antenna ───────────────────────────────────── */
+.codi-antenna {
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 18px;
+    background: linear-gradient(180deg, #00ffea, #334155);
+    border-radius: 2px;
+    z-index: 3;
+}
+
+.codi-antenna-tip {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #00ffea;
+    box-shadow: 0 0 10px #00ffea, 0 0 20px rgba(0, 255, 234, 0.5), 0 0 30px rgba(0, 255, 234, 0.2);
+    animation: antennaPulse 2s ease-in-out infinite;
+}
+
+@keyframes antennaPulse {
+    0%, 100% { box-shadow: 0 0 8px #00ffea, 0 0 16px rgba(0, 255, 234, 0.4); transform: translateX(-50%) scale(1); }
+    50%      { box-shadow: 0 0 14px #00ffea, 0 0 28px rgba(0, 255, 234, 0.7); transform: translateX(-50%) scale(1.2); }
+}
+
+/* ── Head ──────────────────────────────────────── */
+.codi-head {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 72px;
+    height: 56px;
+    background: linear-gradient(145deg, #1e3a5f, #0f2338);
+    border: 2px solid rgba(0, 255, 234, 0.35);
+    border-radius: 20px 20px 16px 16px;
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.5),
+        inset 0 2px 8px rgba(0, 255, 234, 0.08),
+        0 0 20px rgba(0, 255, 234, 0.1);
+    z-index: 2;
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease-out;
+    overflow: visible;
+}
+
+/* Faceplate shine */
+.codi-head::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    width: 30px;
+    height: 12px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+    border-radius: 10px;
+    pointer-events: none;
+}
+
+/* ── Eyes ──────────────────────────────────────── */
+.codi-eyes {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 14px;
+    z-index: 3;
+}
+
+.codi-eye {
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle at 50% 50%, #0a0a14, #0f172a);
+    border: 2px solid #00ffea;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: inset 0 0 6px rgba(0, 255, 234, 0.3), 0 0 8px rgba(0, 255, 234, 0.2);
+    overflow: hidden;
+}
+
+.codi-pupil {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background: radial-gradient(circle at 30% 30%, #00ffea, #0284c7);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
+    box-shadow: 0 0 6px #00ffea;
+}
+
+/* Reflection dot on pupil */
+.codi-pupil::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 2.5px;
+    height: 2.5px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+}
+
+/* ── Mouth ─────────────────────────────────────── */
+.codi-mouth {
+    position: absolute;
+    bottom: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 4px;
+    border-radius: 0 0 8px 8px;
+    background: #00ffea;
+    box-shadow: 0 0 6px rgba(0, 255, 234, 0.5);
+    z-index: 3;
+    transition: all 0.3s ease;
+}
+
+#codi-mascot-container:hover .codi-mouth {
+    width: 22px;
+    height: 8px;
+    border-radius: 0 0 12px 12px;
+}
+
+/* ── Body ──────────────────────────────────────── */
+.codi-body {
+    position: absolute;
+    top: 66px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 56px;
+    height: 50px;
+    background: linear-gradient(170deg, #1e3a5f, #0c1e30);
+    border: 2px solid rgba(0, 255, 234, 0.25);
+    border-radius: 14px 14px 18px 18px;
+    box-shadow:
+        0 6px 15px rgba(0, 0, 0, 0.5),
+        inset 0 1px 4px rgba(0, 255, 234, 0.05);
+    z-index: 1;
+}
+
+/* Chest light */
+.codi-chest-light {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #00ffea, #0c4a6e);
+    box-shadow: 0 0 12px rgba(0, 255, 234, 0.6), 0 0 24px rgba(0, 255, 234, 0.2);
+    animation: chestPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes chestPulse {
+    0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+    50%      { opacity: 1; transform: translateX(-50%) scale(1.1); }
+}
+
+/* Chest panel lines */
+.codi-chest-lines {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.codi-chest-line {
+    width: 28px;
+    height: 2px;
+    background: rgba(0, 255, 234, 0.15);
+    border-radius: 1px;
+}
+
+/* ── Arms ──────────────────────────────────────── */
+.codi-arm {
+    position: absolute;
+    top: 72px;
+    width: 12px;
+    height: 30px;
+    background: linear-gradient(180deg, #1e3a5f, #0f2338);
+    border: 1.5px solid rgba(0, 255, 234, 0.2);
+    border-radius: 6px;
+    z-index: 0;
+    transform-origin: top center;
+}
+
+.codi-arm-left {
+    left: 10px;
+    animation: armSwayLeft 4s ease-in-out infinite;
+}
+
+.codi-arm-right {
+    right: 10px;
+    animation: armSwayRight 4s ease-in-out infinite;
+}
+
+@keyframes armSwayLeft {
+    0%, 100% { transform: rotate(-5deg); }
+    50%      { transform: rotate(5deg); }
+}
+
+@keyframes armSwayRight {
+    0%, 100% { transform: rotate(5deg); }
+    50%      { transform: rotate(-5deg); }
+}
+
+/* Wave on hover */
+#codi-mascot-container:hover .codi-arm-right {
+    animation: armWave 0.6s ease-in-out 3;
+}
+
+@keyframes armWave {
+    0%, 100% { transform: rotate(5deg); }
+    25%      { transform: rotate(-30deg); }
+    75%      { transform: rotate(-20deg); }
+}
+
+/* ── Feet ──────────────────────────────────────── */
+.codi-feet {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.codi-foot {
+    width: 18px;
+    height: 10px;
+    background: linear-gradient(180deg, #1e3a5f, #0f2338);
+    border: 1.5px solid rgba(0, 255, 234, 0.2);
+    border-radius: 4px 4px 8px 8px;
+}
+
+/* ── Shadow ────────────────────────────────────── */
+.codi-shadow {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 8px;
+    background: radial-gradient(ellipse, rgba(0, 255, 234, 0.15), transparent 70%);
+    border-radius: 50%;
+    animation: shadowPulse 3s ease-in-out infinite;
+}
+
+@keyframes shadowPulse {
+    0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.6; }
+    50%      { transform: translateX(-50%) scaleX(0.85); opacity: 0.35; }
+}
+
+/* ── Speech Bubble ─────────────────────────────── */
+.codi-speech {
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: rgba(15, 23, 42, 0.95);
+    border: 1.5px solid rgba(0, 255, 234, 0.4);
+    border-radius: 12px;
+    padding: 8px 14px;
+    color: #e2e8f0;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    direction: rtl;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 255, 234, 0.1);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    z-index: 10;
+}
+
+.codi-speech::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    background: rgba(15, 23, 42, 0.95);
+    border-right: 1.5px solid rgba(0, 255, 234, 0.4);
+    border-bottom: 1.5px solid rgba(0, 255, 234, 0.4);
+}
+
+.codi-speech.visible {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+/* ── Blink animation ──────────────────────────── */
+.codi-eye.blinking {
+    animation: eyeBlink 0.15s ease-in-out;
+}
+
+@keyframes eyeBlink {
+    0%, 100% { transform: scaleY(1); }
+    50%      { transform: scaleY(0.1); }
+}
+
+/* ── Mobile adjustments ───────────────────────── */
+@media (max-width: 600px) {
+    #codi-mascot-container {
+        width: 70px;
+        height: 100px;
+        bottom: 80px;
+        left: 10px;
+    }
+
+    .codi-head {
+        width: 52px;
+        height: 40px;
+        top: 12px;
+        border-radius: 14px 14px 10px 10px;
+    }
+
+    .codi-eyes {
+        top: 10px;
+        gap: 10px;
+    }
+
+    .codi-eye {
+        width: 14px;
+        height: 14px;
+    }
+
+    .codi-pupil {
+        width: 5px;
+        height: 5px;
+    }
+
+    .codi-mouth {
+        bottom: 6px;
+        width: 12px;
+        height: 3px;
+    }
+
+    .codi-body {
+        width: 40px;
+        height: 36px;
+        top: 48px;
+    }
+
+    .codi-chest-light {
+        width: 10px;
+        height: 10px;
+    }
+
+    .codi-arm {
+        width: 9px;
+        height: 22px;
+        top: 52px;
+    }
+
+    .codi-arm-left { left: 6px; }
+    .codi-arm-right { right: 6px; }
+
+    .codi-antenna {
+        height: 12px;
+        top: 2px;
+    }
+
+    .codi-antenna-tip {
+        width: 7px;
+        height: 7px;
+    }
+
+    .codi-foot {
+        width: 14px;
+        height: 8px;
+    }
+
+    .codi-speech {
+        font-size: 0.65rem;
+        padding: 6px 10px;
+    }
+}
