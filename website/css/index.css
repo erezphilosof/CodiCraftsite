@@ -5,11 +5,28 @@ html, body {
     overflow-x: hidden !important;
     background-color: #000;
     color: #fff;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Space Grotesk', 'Rubik', 'Arial', sans-serif;
 }
 
 *, *:before, *:after {
     box-sizing: border-box;
+}
+
+/* Global heading typography */
+h1, .shape-title {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+}
+
+h2 {
+    font-family: 'Fredoka One', cursive;
+    letter-spacing: 0.5px;
+}
+
+h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .lines {
@@ -409,17 +426,17 @@ nav a:hover .icon {
 }
 
 #shape-title {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 1.4rem;
-    font-weight: 400;
+    font-weight: 600;
     margin: 0;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-transform: uppercase;
     text-shadow: 0 0 10px rgb(255 255 255 / .3)
 }
 
 #shape-desc {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: .85rem;
     margin: 4px 0 0 0;
     opacity: .7;
